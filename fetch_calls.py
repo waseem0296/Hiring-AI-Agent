@@ -292,24 +292,7 @@ class VoiceAIExtractor:
         os.makedirs('call_data', exist_ok=True)
         
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"call_data/recent_call_qa_{timestamp}.txt"
-        
-        with open(filename, 'w', encoding='utf-8') as f:
-            f.write("="*60 + "\n")
-            f.write("MOST RECENT CALL - INTERVIEW Q&A\n")
-            f.write("="*60 + "\n\n")
-            f.write(f"Call Date: {call_info['createdAt']}\n")
-            f.write(f"Duration: {call_info['duration']} seconds\n")
-            f.write(f"Call ID: {call_info['id']}\n\n")
-            f.write("="*60 + "\n\n")
-            
-            for i, qa in enumerate(qa_pairs, 1):
-                f.write(f"Question {i}:\n{qa['question']}\n\n")
-                f.write(f"Answer {i}:\n{qa['answer']}\n\n")
-                f.write("-"*60 + "\n\n")
-        
-        print(f"✅ Q&A saved to: {filename}")
-        
+               
         # Also save as JSON for easy parsing
         json_filename = f"call_data/recent_call_qa_{timestamp}.json"
         with open(json_filename, 'w', encoding='utf-8') as f:
