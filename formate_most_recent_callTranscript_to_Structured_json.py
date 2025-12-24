@@ -5,6 +5,8 @@ from datetime import datetime
 import os
 import re
 from difflib import SequenceMatcher
+from dotenv import load_dotenv
+load_dotenv()
 
 class HireologyQAExtractor:
     def __init__(self, api_key, location_id, groq_api_key=None):
@@ -382,7 +384,8 @@ if __name__ == "__main__":
     API_KEY = "pit-6ce5eac0-b1b2-4e1e-8313-018cbf31e324" 
     LOCATION_ID = "M5jnxd1r8yq3o5gxSYOP" 
     AGENT_ID = "693448f6231659c2a32a3bca"
-    GROQ_API_KEY = "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"
+    GROQ_API_KEY=os.getenv("GROQ_API_KEY")
+    # GROQ_API_KEY = "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"
     
     extractor = HireologyQAExtractor(API_KEY, LOCATION_ID, GROQ_API_KEY)
     qa_pairs = extractor.extract_for_hireology(agent_id=AGENT_ID)
