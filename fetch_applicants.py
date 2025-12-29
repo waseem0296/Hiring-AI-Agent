@@ -1,4 +1,4 @@
-# fetch_applicants
+
 import requests
 import csv
 import json
