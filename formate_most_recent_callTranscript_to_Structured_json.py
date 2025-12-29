@@ -1,4 +1,5 @@
 
+# formate_most_recent_callTranscript_to_Structured_json.py
 import requests
 import json
 from datetime import datetime
@@ -385,7 +386,6 @@ if __name__ == "__main__":
     LOCATION_ID = "M5jnxd1r8yq3o5gxSYOP" 
     AGENT_ID = "693448f6231659c2a32a3bca"
     GROQ_API_KEY=os.getenv("GROQ_API_KEY")
-    # GROQ_API_KEY = "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"
     
     extractor = HireologyQAExtractor(API_KEY, LOCATION_ID, GROQ_API_KEY)
     qa_pairs = extractor.extract_for_hireology(agent_id=AGENT_ID)
