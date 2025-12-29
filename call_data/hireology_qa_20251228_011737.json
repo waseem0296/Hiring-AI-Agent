@@ -1,0 +1,128 @@
+{
+  "call_info": {
+    "date": "2025-12-27T19:31:40.302Z",
+    "duration": 38,
+    "call_id": "6950341cdac0be2037c82e03"
+  },
+  "qa_pairs": [
+    {
+      "question": "Can you tell me a little about your background and experience in care professionals?",
+      "answer": "No. am very angry now. Okay. Thank you. I I do not have any time. can you terminate the interview?",
+      "rating": "Poor",
+      "matched_question": "begin.Can you tell me a little about your background and experience as a care professional?",
+      "match_score": 0.9257142857142857
+    },
+    {
+      "question": "What motivated you to become a care professional?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Do you have any certifications or specialized training related to caregiving? (CNA, MA, CPR, etc.)",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Can you name a few caregiving tasks you have experience in?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Do you have experience with tasks such as bathing, dressing, and toileting clients?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Do you have another job? What's your availability?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "How flexible is your schedule, and are you available for overnight or weekend shifts if needed?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Do you have reliable transportation to get to clients' homes? Is this your own vehicle?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Why do you want to work for our home care agency specifically?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience using a Hoyer Lift or Stand Assist? (Manual or Electric)",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience using a Gait Belt?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience with Hospice Clients",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience with a client on Hospice Care who is Transitioning",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience using a Sliding board?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience with Total Care Clients and/or bedridden clients?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience giving bed baths, changing the client in bed, turning, repositioning, and changing sheets of a bedridden client?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience emptying foley catheters and male condom catheters?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    }
+  ]
+}

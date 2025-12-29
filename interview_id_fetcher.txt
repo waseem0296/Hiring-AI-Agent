@@ -1,0 +1,61 @@
+
+# //////////////
+import requests
+
+API_BASE_URL = "https://api.hireology.com/v2"
+BEARER_TOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6IlJNblFlZmkwZFB5emRIdFR0Z2xrVmdFWGp0SHFzSEFkb0Jjbi1nMjJJb1UiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJiMWUwZTc4Yy05MGU3LTQxOTgtOTU5NC0zMDI3ZWZkN2Y3MTAiLCJpc3MiOiJodHRwczovL2FjY291bnRzLmhpcmVvbG9neS5jb20vNDZlODJkZWEtOTFmNC00ZDMwLWFhYmMtYWMxZWUwMzBiZWMyL3YyLjAvIiwiZXhwIjoxNzY2ODQ0NTY3LCJuYmYiOjE3NjY4NDA5NjcsInN1YiI6IjIzMGE5NjZhLTc4Y2ItNGMzOS1hZGEzLTdlODkyNWNjNmQ5MSIsIm9pZCI6IjIzMGE5NjZhLTc4Y2ItNGMzOS1hZGEzLTdlODkyNWNjNmQ5MSIsInRpZCI6IjQ2ZTgyZGVhLTkxZjQtNGQzMC1hYWJjLWFjMWVlMDMwYmVjMiIsImttc2kiOiJGYWxzZSIsInNjcCI6InYyIGFpIHYzIiwiYXpwIjoiZjA2N2U2YTMtODE1ZC00MTNkLTg3OGUtZDIyM2VmYWEwY2E0IiwidmVyIjoiMS4wIiwiaWF0IjoxNzY2ODQwOTY3fQ.UN89RbEGniBBoEwo3fsAcY-ookWDoNcj-1uSCWPMNT2rHyiicKsVDTuReYqtOMR4E-cnhwD4gmFpJts9socBdeUehsDw4bwHE_woE9v7MXXdckz1Rlp-nKyUZEXrNpJ927zEaKYZ3vz0I_QrQlAZLlGcheLrmL0lRWzqgMfHqVrDK0IQCtB6fiadKHCx4mRE5-rH92iqvqd-h5AjvbSCWCJKFVGMYi8vUwfReZ0fGspFAOSvZJMBfW2jxtW5BlXCFqVCizknsOaHFNq_h79MJc9t3NYrKjjIIxtBotnp-0u9EaoVyKyOqcfEIrucnt-d2q-5_DICptkmOza-OYYnuQ"
+JOB_ID = "2606114"
+# CANDIDATE_ID = "47026869"
+CANDIDATE_ID = "47113924"
+
+
+
+def fetch_latest_interview_id(jwt:str,job_id:str,candidate_id:str) -> str:
+    """
+    Fetch interview ID for a candidate.
+    Hireology returns a DICTIONARY:
+    {
+        "<interview_id>": { interview_data }
+    }
+    """
+
+    url = f"https://api.hireology.com/v2/jobs/{job_id}/candidates/{candidate_id}/interviews"
+
+    headers = {
+        "Accept": "application/json",
+        "Authorization": f"Bearer {jwt}"
+    }
+
+    response = requests.get(url, headers=headers)
+    print("the responce:",response.json())
+
+    if response.status_code != 200:
+        raise Exception(
+            f"Failed to fetch interviews: {response.status_code} - {response.text}"
+        )
+
+    interviews = response.json()
+
+    if not interviews or not isinstance(interviews, dict):
+        raise Exception("No interviews found for this candidate")
+
+    # ✅ Interview ID is the KEY
+    interview_id = next(iter(interviews.keys()))
+
+    return interview_id
+
+
+def main():
+    print("=" * 70)
+    print("Hireology Interview Answer Update Script")
+    print("=" * 70)
+
+    try:
+        interview_id = fetch_latest_interview_id(BEARER_TOKEN,JOB_ID,CANDIDATE_ID)
+        print(f"🔎 Auto-detected Interview ID: {interview_id}")
+    except Exception as e:
+        print(f"✗ Failed to determine interview ID: {e}")
+
+
+if __name__ == "__main__":
+    main()
