@@ -1,7 +1,8 @@
+
 """
-Complete Hiring Workflow Application with Call Integration
-Orchestrates: Applicant Screening -> Phone Call to Candidate -> Wait for Call Completion -> 
-             Interview Transcript Processing -> Hireology Update -> Score Calculation
+Complete Hiring Workflow Application
+Orchestrates: Applicant Screening -> Phone Call -> Wait for Completion -> 
+             Phone Interview Processing -> Hireology Update -> Score Calculation
 """
 
 import os
@@ -10,8 +11,6 @@ import time
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import requests
-from typing import Literal
-
 # Import from your existing files
 from fetch_applicants import (
     get_candidates,
@@ -38,7 +37,6 @@ from update_phoneInterview_on_Hireology import (
 )
 from interview_id_fetcher import fetch_interview_id
 from agent_call import make_trial_call
-from fetch_calls import VoiceAIExtractor
 
 load_dotenv()
 
@@ -46,6 +44,7 @@ load_dotenv()
 class CallStatusChecker:
     """Helper class to check call status from GoHighLevel"""
     
+
     def __init__(self, api_key: str, location_id: str, agent_id: str):
         self.api_key = api_key
         self.location_id = location_id
@@ -56,63 +55,83 @@ class CallStatusChecker:
             "Content-Type": "application/json",
             "Version": "2021-07-28"
         }
-    
-    def get_recent_call_for_phone(self, phone_number: str, since_time: datetime = None):
+
+    def get_call_status(self, call_id: str):
         """
-        Check if there's a completed call to a specific phone number
-        
-        Args:
-            phone_number: The phone number to check for
-            since_time: Optional - only look for calls after this time
-        
-        Returns:
-            Call data if a completed call is found, None otherwise
+        Check real-time call status using callId
         """
-        url = f"{self.base_url}/voice-ai/dashboard/call-logs"
-        
+        url = f"{self.base_url}/voice-ai/call/{call_id}"
         params = {
             "locationId": self.location_id,
             "agentId": self.agent_id
         }
-        
+
         try:
             response = requests.get(url, headers=self.headers, params=params)
             response.raise_for_status()
-            call_logs = response.json()
-            
-            if not call_logs or 'data' not in call_logs:
-                return None
-            
-            # Normalize the phone number for comparison
-            normalized_target = self._normalize_phone(phone_number)
-            
-            for call in call_logs.get('data', []):
-                # Check if this call matches the phone number
-                call_to_phone = self._normalize_phone(call.get('toNumber', '') or call.get('phoneNumber', ''))
-                
-                if call_to_phone == normalized_target:
-                    # Check if call was after the since_time (if provided)
-                    if since_time:
-                        call_time_str = call.get('createdAt', '')
-                        if call_time_str:
-                            try:
-                                # Parse ISO format datetime
-                                call_time = datetime.fromisoformat(call_time_str.replace('Z', '+00:00'))
-                                since_time_utc = since_time.replace(tzinfo=call_time.tzinfo) if since_time.tzinfo is None else since_time
-                                if call_time < since_time_utc:
-                                    continue
-                            except:
-                                pass
-                    
-                    # Check if call has a transcript (indicates completion)
-                    if call.get('transcript') or call.get('status') == 'completed':
-                        return call
-            
-            return None
-            
+            return response.json()
         except requests.exceptions.RequestException as e:
             print(f"Error checking call status: {e}")
             return None
+
+    
+    # def get_recent_call_for_phone(self, phone_number: str, since_time: datetime = None):
+    #     """
+    #     Check if there's a completed call to a specific phone number
+        
+    #     Args:
+    #         phone_number: The phone number to check for
+    #         since_time: Optional - only look for calls after this time
+        
+    #     Returns:
+    #         Call data if a completed call is found, None otherwise
+    #     """
+    #     url = f"{self.base_url}/voice-ai/dashboard/call-logs"
+        
+    #     params = {
+    #         "locationId": self.location_id,
+    #         "agentId": self.agent_id
+    #     }
+        
+    #     try:
+    #         response = requests.get(url, headers=self.headers, params=params)
+    #         response.raise_for_status()
+    #         call_logs = response.json()
+            
+    #         if not call_logs or 'data' not in call_logs:
+    #             return None
+            
+    #         # Normalize the phone number for comparison
+    #         normalized_target = self._normalize_phone(phone_number)
+            
+    #         for call in call_logs.get('data', []):
+    #             # Check if this call matches the phone number
+    #             call_to_phone = self._normalize_phone(call.get('toNumber', '') or call.get('phoneNumber', ''))
+                
+    #             if call_to_phone == normalized_target:
+    #                 # Check if call was after the since_time (if provided)
+    #                 if since_time:
+    #                     call_time_str = call.get('createdAt', '')
+    #                     if call_time_str:
+    #                         try:
+    #                             # Parse ISO format datetime
+    #                             call_time = datetime.fromisoformat(call_time_str.replace('Z', '+00:00'))
+    #                             since_time_utc = since_time.replace(tzinfo=call_time.tzinfo) if since_time.tzinfo is None else since_time
+    #                             if call_time < since_time_utc:
+    #                                 continue
+    #                         except:
+    #                             pass
+                    
+    #                 # Check if call has reached a terminal status (completed, failed, cancelled, etc.)
+    #                 status = call.get('status')
+    #                 if call.get('transcript') or status in ['completed', 'failed', 'busy', 'no-answer', 'cancelled', 'voicemail']:
+    #                     return call
+            
+    #         return None
+            
+    #     except requests.exceptions.RequestException as e:
+    #         print(f"Error checking call status: {e}")
+    #         return None
     
     def _normalize_phone(self, phone: str) -> str:
         """Normalize phone number for comparison (remove non-digits)"""
@@ -120,58 +139,86 @@ class CallStatusChecker:
             return ""
         return ''.join(filter(str.isdigit, str(phone)))
     
-    def wait_for_call_completion(
-        self, 
-        phone_number: str, 
-        timeout_minutes: int = 15, 
-        poll_interval_seconds: int = 10,
-        call_start_time: datetime = None
-    ) -> dict:
-        """
-        Wait for a call to be completed
+    # def wait_for_call_completion(
+    #     self, 
+    #     phone_number: str, 
+    #     timeout_minutes: int = 7, 
+    #     poll_interval_seconds: int = 10,
+    #     call_start_time: datetime = None
+    # ) -> dict:
+    #     """
+    #     Wait for a call to be completed
         
-        Args:
-            phone_number: Phone number to monitor
-            timeout_minutes: Maximum time to wait
-            poll_interval_seconds: How often to check for call completion
-            call_start_time: When the call was initiated (to filter old calls)
+    #     Args:
+    #         phone_number: Phone number to monitor
+    #         timeout_minutes: Maximum time to wait
+    #         poll_interval_seconds: How often to check for call completion
+    #         call_start_time: When the call was initiated (to filter old calls)
         
-        Returns:
-            Call data when completed, or None if timeout
-        """
-        start_time = datetime.now()
-        timeout = timedelta(minutes=timeout_minutes)
+    #     Returns:
+    #         Call data when completed, or None if timeout
+    #     """
+    #     start_time = datetime.now()
+    #     timeout = timedelta(minutes=timeout_minutes)
         
-        print(f"\n⏳ Waiting for call to complete...")
-        print(f"   Phone: {phone_number}")
-        print(f"   Timeout: {timeout_minutes} minutes")
-        print(f"   Polling every {poll_interval_seconds} seconds")
+    #     print(f"\n⏳ Waiting for call to complete...")
+    #     print(f"   Phone: {phone_number}")
+    #     print(f"   Timeout: {timeout_minutes} minutes")
+    #     print(f"   Polling every {poll_interval_seconds} seconds")
         
-        while datetime.now() - start_time < timeout:
-            # Check for completed call
-            completed_call = self.get_recent_call_for_phone(
-                phone_number, 
-                since_time=call_start_time
-            )
+    #     while datetime.now() - start_time < timeout:
+    #         # Check for completed call
+    #         completed_call = self.get_recent_call_for_phone(
+    #             phone_number, 
+    #             since_time=call_start_time
+    #         )
             
-            if completed_call:
-                print(f"\n✅ Call completed!")
-                print(f"   Call ID: {completed_call.get('id', 'N/A')}")
-                print(f"   Duration: {completed_call.get('duration', 'N/A')} seconds")
-                return completed_call
+    #         if completed_call:
+    #             status = completed_call.get('status', 'unknown')
+    #             print(f"\n✅ Call finished! Status: {status}")
+    #             print(f"   Call ID: {completed_call.get('id', 'N/A')}")
+    #             print(f"   Duration: {completed_call.get('duration', 'N/A')} seconds")
+    #             return completed_call
             
-            # Wait before next poll
-            elapsed = datetime.now() - start_time
-            remaining = timeout - elapsed
-            print(f"   ⏳ Waiting... (elapsed: {int(elapsed.total_seconds())}s, remaining: {int(remaining.total_seconds())}s)")
-            time.sleep(poll_interval_seconds)
+    #         # Wait before next poll
+    #         elapsed = datetime.now() - start_time
+    #         remaining = timeout - elapsed
+    #         print(f"   ⏳ Waiting... (elapsed: {int(elapsed.total_seconds())}s, remaining: {int(remaining.total_seconds())}s)")
+    #         time.sleep(poll_interval_seconds)
         
-        print(f"\n⚠️ Timeout: Call did not complete within {timeout_minutes} minutes")
-        return None
+    #     print(f"\n⚠️ Timeout: Call did not complete within {timeout_minutes} minutes")
+    #     return None
+
+def wait_for_call_completion(call_checker, call_id, timeout=300, interval=5):
+    """
+    Wait until callStatus becomes completed
+    """
+    start_time = time.time()
+
+    while time.time() - start_time < timeout:
+        data = call_checker.get_call_status(call_id)
+
+        if not data:
+            time.sleep(interval)
+            continue
+
+        call_status = data.get("callStatus")
+
+        print(f"Current callStatus: {call_status}")
+
+        if call_status == "completed":
+            return data
+
+        if call_status in ["failed", "busy", "no-answer", "cancelled"]:
+            return data
+
+        time.sleep(interval)
+
+    raise TimeoutError("Call did not finish within timeout")
 
 
 class HiringWorkflowOrchestrator:
-    """Orchestrates the complete hiring workflow with call integration"""
+    """Orchestrates the complete hiring workflow"""
     
     def __init__(self, config: dict):
         """
@@ -205,7 +252,7 @@ class HiringWorkflowOrchestrator:
         )
     
     def step1_screen_applicants(self):
-        """Step 1: Screen all applicants for a job and identify candidates"""
+        """Step 1: Screen all applicants for a job and fetch existing candidates"""
         print("\n" + "="*80)
         print("STEP 1: SCREENING APPLICANTS")
         print("="*80)
@@ -214,15 +261,15 @@ class HiringWorkflowOrchestrator:
             jwt = self.config['hireology_jwt']
             job_id = self.config['hireology_job_id']
             
-            # Fetch candidates
-            print(f"\n🔍 Fetching candidates for job {job_id}...")
+            screened_applicants = []
+            candidates_to_call = []  # Applicants with status "Candidate"
+            
+            # ========== PART A: Screen new applicants (status = "Applicant") ==========
+            print(f"\n🔍 Fetching NEW applicants for job {job_id}...")
             candidates = get_candidates(jwt_token=jwt, job_id=job_id)
             print("The candidates are:", candidates)
             applicant_ids = extract_applicant_ids(candidates)
-            print(f"✅ Found {len(applicant_ids)} applicants")
-            
-            screened_applicants = []
-            candidates_to_call = []  # Applicants with status "Candidate"
+            print(f"✅ Found {len(applicant_ids)} new applicants to screen")
             
             for idx, candidate_id in enumerate(applicant_ids, 1):
                 print(f"\n{'─'*80}")
@@ -244,7 +291,11 @@ class HiringWorkflowOrchestrator:
                 # Build applicant record
                 applicant_record = build_single_applicant_record(documents)
                 candidate_job_id = documents[0].get("id")
-                candidate_phone = documents[0].get("home_phone") or documents[0].get("cell_phone")
+                candidate_phone = documents[0].get("home_phone") or documents[0].get("cell_phone") 
+                
+                # Use phone from config if this is the target candidate
+                if str(candidate_id) == str(self.config.get('target_candidate_id')):
+                    candidate_phone = self.config.get('candidate_phone') or candidate_phone
                 
                 # Check for incomplete questions
                 incomplete_questions = get_incomplete_questions(applicant_record)
@@ -264,6 +315,8 @@ class HiringWorkflowOrchestrator:
                     
                     status = "incomplete_email_sent" if email_sent else "incomplete_email_failed"
                     screened_applicants.append({
+                
+                
                         'candidate_id': candidate_id,
                         'email': applicant_record["email"],
                         'status': status
@@ -271,9 +324,11 @@ class HiringWorkflowOrchestrator:
                     continue
                 
                 # Decide status
+                # ///////////////////$$$$$$$$ Uncomment here must//////////
                 final_status = decide_candidate_status(applicant_record)
-                print(f"🎯 Decision: {final_status}")
-                
+                # print(f"🎯 Decision: {final_status}")
+                # ////////////////////////%%%%%%%%%%55 must comment here ////////
+                # final_status = "Candidate"
                 # Handle rejection
                 if final_status == "Inactive":
                     rejection_reason = get_rejection_reason(applicant_record)
@@ -288,14 +343,17 @@ class HiringWorkflowOrchestrator:
                     )
                 
                 # Update status in Hireology
+                # ///////////////  uncomment here ///////////////
                 print(f"🔄 Updating status to '{final_status}'...")
-                update_candidate_status(
+                update_candidate_status_response=update_candidate_status(
                     jwt_token=jwt,
                     job_id=job_id,
                     candidate_id=candidate_id,
                     status=final_status
                 )
                 
+                print("The update candidate status response is:", update_candidate_status_response)
+
                 applicant_data = {
                     'candidate_id': candidate_id,
                     'candidate_job_id': candidate_job_id,
@@ -303,23 +361,83 @@ class HiringWorkflowOrchestrator:
                     'status': final_status,
                     'record': applicant_record
                 }
+                # candidate_phone = update_candidate_status_response[0].get("home_phone") or documents[0].get("cell_phone") 
+
 
                 # ADD PHONE ONLY IF STATUS IS "Candidate"
                 if final_status == "Candidate":
                     applicant_data['phone'] = candidate_phone
                     candidates_to_call.append(applicant_data)
-                    print(f"📞 Candidate marked for phone interview: {candidate_phone}")
+                    print(f"Candidate marked for phone interview: {candidate_phone}")
 
                 screened_applicants.append(applicant_data)
-
+            
+            # ========== PART B: Fetch existing Candidates who need calls ==========
+            print(f"\n{'─'*80}")
+            print("🔍 Also fetching EXISTING candidates (already in Candidate status)...")
+            print(f"{'─'*80}")
+            
+            try:
+                # Fetch candidates with "Candidate" status
+                url = f"https://api.hireology.com/v2/jobs/{job_id}/candidates"
+                headers = {
+                    "Authorization": f"Bearer {jwt}",
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                }
+                params = {
+                    "filter[status]": "Candidate",
+                    "sort_dir": "desc",
+                    "sort": "date",
+                    "page_size": 10
+                }
+                
+                response = requests.get(url, headers=headers, params=params)
+                response.raise_for_status()
+                existing_candidates = response.json()
+                
+                existing_candidate_ids = extract_applicant_ids(existing_candidates)
+                print(f"✅ Found {len(existing_candidate_ids)} existing candidates")
+                
+                # Add existing candidates to the call list
+                for candidate_id in existing_candidate_ids:
+                    # Skip if already in our list
+                    if any(c.get('candidate_id') == candidate_id for c in candidates_to_call):
+                        continue
+                    
+                    # Get documents for phone number
+                    documents = get_candidate_documents(
+                        jwt_token=jwt,
+                        job_id=job_id,
+                        candidate_id=candidate_id,
+                        transfer=False
+                    )
+                    
+                    if documents:
+                        candidate_phone = documents[0].get("home_phone") or documents[0].get("cell_phone")
+                        candidate_job_id = documents[0].get("id")
+                        
+                        if candidate_phone:
+                            candidate_data = {
+                                'candidate_id': candidate_id,
+                                'candidate_job_id': candidate_job_id,
+                                'phone': candidate_phone,
+                                'status': 'Candidate',
+                                'email': documents[0].get("email", "")
+                            }
+                            candidates_to_call.append(candidate_data)
+                            print(f"📞 Existing candidate added for calling: {candidate_id} - {candidate_phone}")
+                
+            except Exception as e:
+                print(f"⚠️ Could not fetch existing candidates: {str(e)}")
             
             self.results['screened_applicants'] = screened_applicants
             self.results['candidates_to_call'] = candidates_to_call
             self.results['steps_completed'].append('step1_screening')
             
             print("\n" + "="*80)
-            print(f"✅ STEP 1 COMPLETE: Screened {len(screened_applicants)} applicants")
-            print(f"   Candidates to call: {len(candidates_to_call)}")
+            print(f"✅ STEP 1 COMPLETE: Screened {len(screened_applicants)} new applicants")
+            print(f"   Total candidates to call: {len(candidates_to_call)}")
             print("="*80)
             
             return candidates_to_call
@@ -374,11 +492,22 @@ class HiringWorkflowOrchestrator:
             timeout = self.config.get('call_timeout_minutes', 15)
             interval = self.config.get('poll_interval_seconds', 10)
             
-            completed_call = self.call_checker.wait_for_call_completion(
-                phone_number=phone,
-                timeout_minutes=timeout,
-                poll_interval_seconds=interval,
-                call_start_time=call_start_time
+            # Extract call ID (support both conversationId and id)
+            call_id = call_result.get("conversationId") or call_result.get("id") or call_result.get("callId")
+            
+            if not call_id:
+                print(f"❌ Could not extract Call ID from response: {call_result}")
+                return None
+            
+            print(f"⏳ Waiting for call completion... (Call ID: {call_id})")
+            
+            # Use the global wait_for_call_completion function
+            # Convert timeout from minutes to seconds
+            completed_call = wait_for_call_completion(
+                call_checker=self.call_checker,
+                call_id=call_id,
+                timeout=timeout * 60,
+                interval=interval
             )
             
             if completed_call:
@@ -420,7 +549,7 @@ class HiringWorkflowOrchestrator:
             
             # Extract Q&A from most recent call
             agent_id = agent_id or self.config.get('ghl_agent_id')
-            print(f"\n📞 Extracting interview from agent {agent_id}...")
+            print(f"\n Extracting interview from agent {agent_id}...")
             
             qa_pairs = extractor.extract_for_hireology(agent_id=agent_id)
             
@@ -578,9 +707,9 @@ class HiringWorkflowOrchestrator:
             return False
     
     def run_screening_only(self):
-        """Run only the screening step (Step 1)"""
+        """Run only the screening step (Step 1) - no calls"""
         print("\n" + "="*80)
-        print("🚀 RUNNING SCREENING WORKFLOW")
+        print("🚀 RUNNING SCREENING ONLY WORKFLOW")
         print("="*80)
         print(f"Timestamp: {self.results['timestamp']}")
         
@@ -591,6 +720,7 @@ class HiringWorkflowOrchestrator:
         print("🎉 SCREENING COMPLETE")
         print("="*80)
         print(f"Steps completed: {', '.join(self.results['steps_completed'])}")
+        print(f"Candidates to call: {len(self.results.get('candidates_to_call', []))}")
         print(f"\nErrors: {len(self.results['errors'])}")
         if self.results['errors']:
             for error in self.results['errors']:
@@ -666,7 +796,7 @@ class HiringWorkflowOrchestrator:
             print(f"  {status_icon} {call_info.get('candidate_id')}: {call_info.get('status')}")
         
         if 'interview_score' in self.results:
-            print(f"\n Latest Interview Results:")
+            print(f"\n📊 Latest Interview Results:")
             print(f"   Interview ID: {self.results.get('interview_id', 'N/A')}")
             print(f"   Final Score: {self.results.get('interview_score', 'N/A')}")
             print(f"   Confidence Score: {self.results.get('confidence_score', 'N/A')}")
@@ -726,48 +856,174 @@ class HiringWorkflowOrchestrator:
         print("="*80)
         
         return self.results
+    
+    def run_complete_workflow(self, candidate_id=None):
+        """
+        Run the complete hiring workflow with call integration:
+        Step 1: Screen applicants -> Find "Candidate" status
+        Step 1B: Make call -> Wait for completion
+        Step 2: Process call transcript from GHL
+        Step 3: Update Hireology interview
+        
+        Args:
+            candidate_id: Optional - if provided, uses this specific candidate
+                         if not provided, processes all candidates with "Candidate" status
+        """
+        print("\n" + "="*80)
+        print("🚀 STARTING COMPLETE HIRING WORKFLOW")
+        print("="*80)
+        print(f"Timestamp: {self.results['timestamp']}")
+        
+        # Step 1: Screen applicants
+        candidates_to_call = self.step1_screen_applicants()
+        
+        if not candidates_to_call:
+            print("\n No candidates to call after screening.")
+            # If a specific candidate_id was provided, try to continue with existing transcript
+            if candidate_id:
+                print(f"   Attempting to process existing transcript for candidate {candidate_id}...")
+                json_path = self.step2_process_phone_interview()
+                if json_path:
+                    self.step3_update_hireology_interview(candidate_id, json_path)
+            return self.results
+        
+        print(f"\n Processing {len(candidates_to_call)} candidate(s) for phone interview...")
+        
+        # Process each candidate
+        for idx, candidate in enumerate(candidates_to_call, 1):
+            current_candidate_id = candidate.get('candidate_id')
+            
+            print(f"\n{'='*80}")
+            print(f"PROCESSING CANDIDATE {idx}/{len(candidates_to_call)}")
+            print(f"  ID: {current_candidate_id}")
+            print(f"  Phone: {candidate.get('phone')}")
+            print(f"{'='*80}")
+            
+# //////////////////  must uncomment this line to make call///////////
+            # Step 1B: Make call and wait for completion
+            completed_call = self.step1b_make_call_and_wait(candidate)
+            completed_call = True
+            if not completed_call:
+                print(f"\n Call did not complete for candidate {current_candidate_id}")
+                print("   Skipping to next candidate...")
+                continue
+            
+            # Step 2: Process phone interview transcript
+            json_path = self.step2_process_phone_interview()
+            
+            if not json_path:
+                print(f"\n Failed to process interview for candidate {current_candidate_id}")
+                continue
+            
+            # Step 3: Update Hireology
+            success = self.step3_update_hireology_interview(
+                candidate_id=current_candidate_id,
+                json_path=json_path
+            )
+            
+            if success:
+                print(f"\n Successfully processed candidate {current_candidate_id}")
+            else:
+                print(f"\n Failed to update Hireology for candidate {current_candidate_id}")
+        
+        # Final summary
+        print("\n" + "="*80)
+        print(" COMPLETE WORKFLOW SUMMARY")
+        print("="*80)
+        print(f"Steps completed: {', '.join(self.results['steps_completed'])}")
+        print(f"Candidates called: {len(self.results['candidates_called'])}")
+        
+        for call_info in self.results['candidates_called']:
+            status_icon = "" if call_info.get('status') == 'completed' else "⚠️"
+            print(f"  {status_icon} {call_info.get('candidate_id')}: {call_info.get('status')}")
+        
+        # Display score if available
+        if 'interview_score' in self.results:
+            print(f"\n Latest Interview Results:")
+            print(f"   Interview ID: {self.results.get('interview_id', 'N/A')}")
+            print(f"   Final Score: {self.results.get('interview_score', 'N/A')}")
+            print(f"   Confidence Score: {self.results.get('confidence_score', 'N/A')}")
+            print(f"   Questions Matched: {self.results.get('matched_questions', 0)}")
+        
+        print(f"\nErrors: {len(self.results['errors'])}")
+        if self.results['errors']:
+            for error in self.results['errors']:
+                print(f"   {error}")
+        print("="*80)
+        
+        return self.results
 
 
 # ============= MAIN EXECUTION =============
-
+from applicant_id_fetcher import get_applicants_info
 if __name__ == "__main__":
     print("New execution started")
-    jwt = "eyJhbGciOiJSUzI1NiIsImtpZCI6IlJNblFlZmkwZFB5emRIdFR0Z2xrVmdFWGp0SHFzSEFkb0Jjbi1nMjJJb1UiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJiMWUwZTc4Yy05MGU3LTQxOTgtOTU5NC0zMDI3ZWZkN2Y3MTAiLCJpc3MiOiJodHRwczovL2FjY291bnRzLmhpcmVvbG9neS5jb20vNDZlODJkZWEtOTFmNC00ZDMwLWFhYmMtYWMxZWUwMzBiZWMyL3YyLjAvIiwiZXhwIjoxNzY3MDEyMDI5LCJuYmYiOjE3NjcwMDg0MjksImlkcCI6Imdvb2dsZS5jb20iLCJzdWIiOiIyMzBhOTY2YS03OGNiLTRjMzktYWRhMy03ZTg5MjVjYzZkOTEiLCJvaWQiOiIyMzBhOTY2YS03OGNiLTRjMzktYWRhMy03ZTg5MjVjYzZkOTEiLCJtZmEiOnRydWUsImF6ZnAiOnRydWUsInRpZCI6IjQ2ZTgyZGVhLTkxZjQtNGQzMC1hYWJjLWFjMWVlMDMwYmVjMiIsImttc2kiOiJGYWxzZSIsInNjcCI6InYyIGFpIHYzIiwiYXpwIjoiZjA2N2U2YTMtODE1ZC00MTNkLTg3OGUtZDIyM2VmYWEwY2E0IiwidmVyIjoiMS4wIiwiaWF0IjoxNzY3MDA4NDI5fQ.oFzYH_3kwNmOuyzRk_l0VvMh9Z14gcGm8c_Sz6nVaRi4s0NQAlF83i8Qo_aAydRm3sI-Q0R-h3nBtKn1qOHdQ_vK8JAn_lJelcGqE389oh4ZIjV_iRjfAeRZ7JM1mhtLbG6kcbo9Mj0gkb6MAOzUZVh9nK6KbV2GE4Qbp5a9R-3AvvAg0eRA5Dc7Q-gg9cagI55zKnr-CHpVBnc023OcPrGa-Spt8_gAJH7Y6wANsLvYdnnvFG59GD598BieVLwTeUl9PhPNbgRi4jlXxvCDVpOO7AxnSybYeAYsyL59XDDwVvKnEtaC5oFO_dJyoRdpduVU9qktLHjcNKtFk5va8g"
+    jwt = "eyJhbGciOiJSUzI1NiIsImtpZCI6IlJNblFlZmkwZFB5emRIdFR0Z2xrVmdFWGp0SHFzSEFkb0Jjbi1nMjJJb1UiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJiMWUwZTc4Yy05MGU3LTQxOTgtOTU5NC0zMDI3ZWZkN2Y3MTAiLCJpc3MiOiJodHRwczovL2FjY291bnRzLmhpcmVvbG9neS5jb20vNDZlODJkZWEtOTFmNC00ZDMwLWFhYmMtYWMxZWUwMzBiZWMyL3YyLjAvIiwiZXhwIjoxNzY3Mzg5MzE0LCJuYmYiOjE3NjczODU3MTQsInN1YiI6IjIzMGE5NjZhLTc4Y2ItNGMzOS1hZGEzLTdlODkyNWNjNmQ5MSIsIm9pZCI6IjIzMGE5NjZhLTc4Y2ItNGMzOS1hZGEzLTdlODkyNWNjNmQ5MSIsInRpZCI6IjQ2ZTgyZGVhLTkxZjQtNGQzMC1hYWJjLWFjMWVlMDMwYmVjMiIsImttc2kiOiJGYWxzZSIsInNjcCI6InYyIGFpIHYzIiwiYXpwIjoiZjA2N2U2YTMtODE1ZC00MTNkLTg3OGUtZDIyM2VmYWEwY2E0IiwidmVyIjoiMS4wIiwiaWF0IjoxNzY3Mzg1NzE0fQ.yMensq968mJ6hafEHFXUdXsFEwsgzWp9OOfwfGINCCw1zXEuRNysSiHdxTilkeQFLAiT82YM1lpFb-A1iIKSPKUVpu0k274V8q7KI8VzxPbqXtjDdHnccnn41Wh0Ncsr2W-2dl0_gUSPy1EL3j1OI4Xie1L-QezJBIZlDUap_icqrujBt0SHSzq-LJ8F-zQ8ORZMMrY4tnDhyaG6C6EET7aoWPJ04g0Txw6XLnz7lB55tRh8oT9xtFePBkVTV2z22xVQV5MwQ8svT0rWM9JvtPG-Yo2CN6fmt-LbLjrVVHPeS8u0rCyFgsKtE_SHkrLrDs8EOu0dYVtj4s4N9Rs0lw"
     job_id = "2606114"
-    candidate_id = "47113924"
+    ghl_token_id = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImEzOGVhNmEwNDA4YjBjYzVkYTE4OWRmYzg4ODgyZDBmMWI3ZmJmMGUiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoiaVJHOGdKSzI3MFBoUENSQlE3OUMiLCJjb21wYW55X2lkIjoiM2s4Wlh3VjNxVUZVU0JubjlSbDAiLCJyb2xlIjoiYWRtaW4iLCJ0eXBlIjoiYWNjb3VudCIsInZlcnNpb24iOjIsImxvY2F0aW9ucyI6WyJNNWpueGQxcjh5cTNvNWd4U1lPUCJdLCJwZXJtaXNzaW9ucyI6eyJ3b3JrZmxvd3NfZW5hYmxlZCI6dHJ1ZSwid29ya2Zsb3dzX3JlYWRfb25seSI6ZmFsc2V9LCJwcmltYXJ5VXNlciI6e30sImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9oaWdobGV2ZWwtYmFja2VuZCIsImF1ZCI6ImhpZ2hsZXZlbC1iYWNrZW5kIiwiYXV0aF90aW1lIjoxNzY3MzY5MzM3LCJzdWIiOiJpUkc4Z0pLMjcwUGhQQ1JCUTc5QyIsImlhdCI6MTc2NzM4NjQwMSwiZXhwIjoxNzY3MzkwMDAxLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7fSwic2lnbl9pbl9wcm92aWRlciI6ImN1c3RvbSJ9fQ.5JOZDuBkoKMujGChOUoup9fFjBKkAayYAlJVs-rRai0HKG5hxQ3rUs1kvpljBQ3EQY334yeSi767zjFJk8IMDhRvqGrCehaxkcyp7WcqDdvNJ_KBmIhHy-JiCU_FsKMWzGURwYwC-MjklH36nZw-N7eEwaqp_UVSlTaGNOqrLqLXRf6LUgAr0_FR9SIXThUnZdf0iVmjxtGWXmyY7NglY_QgDRURR1wIuNg95WBivC3qMrM2fCvZhpKyYJCYsU-tOZ6l551wEF-OqNOULnf77MC03dVTJMCHWEAUy3zGG41JAl4Ao_RxA8eQidnsjw7BbaRniouyt70jkPCJXuIdag"
+    print("\n" + "="*80)
+    print("Fetching applicants...")
+    print("="*80)
+    applicants = get_applicants_info(jwt, job_id)
+    
+    
+
+    if not applicants:
+        raise RuntimeError("No applicants found for this job.")
+    else:
+        print(f"Found {len(applicants)} applicants for job ID {job_id}")
+        print("the applicants are:")
+        for i, applicant in enumerate(applicants):
+            print(f"[{i}] ID: {applicant['id']} | Phone: {applicant['phone']}")
+
+
+    for i, applicant in enumerate(applicants):
+        print(f"[{i}] ID: {applicant['id']} | Phone: {applicant['phone']}")
+        candidate_id = applicants[i]["id"]
+        candidate_phone = applicants[i]["phone"]
+
+        print(f" Using Candidate ID: {candidate_id}")
+        print(f" Candidate Phone: {candidate_phone}")
+        
+    
     
     # GHL Token ID (for making calls - this needs to be a valid session token)
-    ghl_token_id = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImEzOGVhNmEwNDA4YjBjYzVkYTE4OWRmYzg4ODgyZDBmMWI3ZmJmMGUiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoiaVJHOGdKSzI3MFBoUENSQlE3OUMiLCJjb21wYW55X2lkIjoiM2s4Wlh3VjNxVUZVU0JubjlSbDAiLCJyb2xlIjoiYWRtaW4iLCJ0eXBlIjoiYWNjb3VudCIsInZlcnNpb24iOjIsImxvY2F0aW9ucyI6WyJNNWpueGQxcjh5cTNvNWd4U1lPUCJdLCJwZXJtaXNzaW9ucyI6eyJ3b3JrZmxvd3NfZW5hYmxlZCI6dHJ1ZSwid29ya2Zsb3dzX3JlYWRfb25seSI6ZmFsc2V9LCJwcmltYXJ5VXNlciI6e30sImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9oaWdobGV2ZWwtYmFja2VuZCIsImF1ZCI6ImhpZ2hsZXZlbC1iYWNrZW5kIiwiYXV0aF90aW1lIjoxNzY2ODQ0OTM4LCJzdWIiOiJpUkc4Z0pLMjcwUGhQQ1JCUTc5QyIsImlhdCI6MTc2NzAwOTMzMiwiZXhwIjoxNzY3MDEyOTMyLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7fSwic2lnbl9pbl9wcm92aWRlciI6ImN1c3RvbSJ9fQ.JtBtwRtWQUyvMzOMWpzvZoclG8JSyzdVKw6CnWfDCAdCqLJZ5K5nmjOsTLGRQ6pOZ_Yad-JSns3wzhVFzk9bVuTLedJS7y_sFI0ViyWKexIIp2QIYOdj0dcfLJgRy-zwl7URoGSHd_pkd7tWiKSkRt7_7-NA_H3-vYlJ8M36mL3Sf9racz54XPe0EtmCBW074_uN9CFe9IlLlQRHS1mQPJgdUM06XpNccIDWuTHqLuUnG92eHzJJL4xowNWEAoctphTS0PMJhvjAUYfFa4o9mBIzD0WKCKHxFoU0-HWgCgY9BE9ohS7IEtJbDX1QgXemEYL5AqTAg4Rj0mn9IaKw1A"
     
     # Configuration
-    config = {
-        'hireology_jwt': jwt,
-        'hireology_job_id': job_id,
-        'ghl_api_key': "pit-6ce5eac0-b1b2-4e1e-8313-018cbf31e324",
-        'ghl_location_id': "M5jnxd1r8yq3o5gxSYOP",
-        'ghl_agent_id': "693448f6231659c2a32a3bca",
-        'ghl_token_id': ghl_token_id,
-        'ghl_from_phone': "+18439407924",
-        'groq_api_key': os.getenv("GROQ_API_KEY"),
-        # Call waiting settings
-        'call_timeout_minutes': 15,  # Max time to wait for call completion
-        'poll_interval_seconds': 10  # How often to check for call completion
-    }
+        config = {
+            'hireology_jwt': jwt,
+            'hireology_job_id': job_id,
+            'ghl_api_key': "pit-6ce5eac0-b1b2-4e1e-8313-018cbf31e324",
+            'ghl_location_id': "M5jnxd1r8yq3o5gxSYOP",
+            'ghl_agent_id': "693448f6231659c2a32a3bca",
+            'ghl_token_id': ghl_token_id,
+            'ghl_from_phone': "+18439407924",
+            'ghl_to_phone': candidate_phone,
+            'groq_api_key': os.getenv("GROQ_API_KEY"),
+            # Call waiting settings
+            'call_timeout_minutes': 15,  # Max time to wait for call completion
+            'poll_interval_seconds': 10,  # How often to check for call completion
+            'candidate_phone': candidate_phone,
+            'target_candidate_id': candidate_id
+        }
     
     # Create orchestrator
-    orchestrator = HiringWorkflowOrchestrator(config)
+        orchestrator = HiringWorkflowOrchestrator(config)
     
     # ========== USAGE EXAMPLES ==========
     
-    # EXAMPLE 1: Run complete workflow with calls
+    # EXAMPLE 1: Run complete workflow (RECOMMENDED)
     # This will: Screen -> Call candidates -> Wait for call -> Process transcript -> Update Hireology
-    results = orchestrator.run_screening_with_calls()
+        results = orchestrator.run_complete_workflow(candidate_id=candidate_id)
     
-    # EXAMPLE 2: Run only screening (Step 1)
+    # EXAMPLE 2: Run only screening (Step 1) - no calls
     # results = orchestrator.run_screening_only()
     
     # EXAMPLE 3: Run only interview workflow (Steps 2 & 3) - for when call already happened
     # results = orchestrator.run_interview_workflow(candidate_id=candidate_id)
+    
+    # EXAMPLE 4: Run screening with calls (alternative method)
+    # results = orchestrator.run_screening_with_calls()
     
     # Save results to file
     with open('workflow_results.json', 'w') as f:

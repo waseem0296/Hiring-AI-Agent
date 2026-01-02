@@ -61,8 +61,7 @@ def make_trial_call(
     
     try:
         response = requests.post(url, headers=headers, json=payload)
-        
-        if response.status_code == 200:
+        if response.status_code == 200 or response.status_code == 201:
             result = response.json()
             print(f"✅ Call initiated successfully!")
             print(f"   Response: {json.dumps(result, indent=2)}")
@@ -81,13 +80,13 @@ def make_trial_call(
 
 if __name__ == "__main__":
     # Configuration
-    TOKEN_ID = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImEzOGVhNmEwNDA4YjBjYzVkYTE4OWRmYzg4ODgyZDBmMWI3ZmJmMGUiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoiaVJHOGdKSzI3MFBoUENSQlE3OUMiLCJjb21wYW55X2lkIjoiM2s4Wlh3VjNxVUZVU0JubjlSbDAiLCJyb2xlIjoiYWRtaW4iLCJ0eXBlIjoiYWNjb3VudCIsInZlcnNpb24iOjIsImxvY2F0aW9ucyI6WyJNNWpueGQxcjh5cTNvNWd4U1lPUCJdLCJwZXJtaXNzaW9ucyI6eyJ3b3JrZmxvd3NfZW5hYmxlZCI6dHJ1ZSwid29ya2Zsb3dzX3JlYWRfb25seSI6ZmFsc2V9LCJwcmltYXJ5VXNlciI6e30sImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9oaWdobGV2ZWwtYmFja2VuZCIsImF1ZCI6ImhpZ2hsZXZlbC1iYWNrZW5kIiwiYXV0aF90aW1lIjoxNzY2ODQ0OTM4LCJzdWIiOiJpUkc4Z0pLMjcwUGhQQ1JCUTc5QyIsImlhdCI6MTc2NzAxMjYzNSwiZXhwIjoxNzY3MDE2MjM1LCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7fSwic2lnbl9pbl9wcm92aWRlciI6ImN1c3RvbSJ9fQ.qNatUIgK2XNasWQToVIYAkJAhIWtmSP-6wEGU2ylzCu1u-LP5B4JbMiFvB_1nLI7awUHJxBXVQXIM3HmIWYNuzVVb3Ab0s4sqri0R3D01hsRsBn0YakzQYh7dewMTfB8LJT3jL43Lp8DF6IH1wPPiW79OAPqRt32YQWeq8IUMuKxcylmX-X7oMFg9gxy1F_VBkLe4elSfRYAHQesBLk9uZ53wKy-lP3hAVOFCQISIpnCd3_4fjYwH0q0iZGx4HFCRLdcTU9epN_zQ1WbH0-L0bbji4WkUN5B4bIm_oOuhIkuFr58kIpaESbhRJMayaGj109WaOWN-7doK4adjYTqLg"
+    TOKEN_ID = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImEzOGVhNmEwNDA4YjBjYzVkYTE4OWRmYzg4ODgyZDBmMWI3ZmJmMGUiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoiaVJHOGdKSzI3MFBoUENSQlE3OUMiLCJjb21wYW55X2lkIjoiM2s4Wlh3VjNxVUZVU0JubjlSbDAiLCJyb2xlIjoiYWRtaW4iLCJ0eXBlIjoiYWNjb3VudCIsInZlcnNpb24iOjIsImxvY2F0aW9ucyI6WyJNNWpueGQxcjh5cTNvNWd4U1lPUCJdLCJwZXJtaXNzaW9ucyI6eyJ3b3JrZmxvd3NfZW5hYmxlZCI6dHJ1ZSwid29ya2Zsb3dzX3JlYWRfb25seSI6ZmFsc2V9LCJwcmltYXJ5VXNlciI6e30sImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9oaWdobGV2ZWwtYmFja2VuZCIsImF1ZCI6ImhpZ2hsZXZlbC1iYWNrZW5kIiwiYXV0aF90aW1lIjoxNzY2ODQ0OTM4LCJzdWIiOiJpUkc4Z0pLMjcwUGhQQ1JCUTc5QyIsImlhdCI6MTc2NzAyMjU0MCwiZXhwIjoxNzY3MDI2MTQwLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7fSwic2lnbl9pbl9wcm92aWRlciI6ImN1c3RvbSJ9fQ.Dozb1Lwc8Rmtlqj6v-ab-dK1mBymHf0EkL0h4BfjUiq8LVYFXRayKt0S3LfxNIDS3qpv4r0fJ2UNUarsReWpKuKeGm3ZDYCBNOUAoClb7Vwc06AuOKNFb8B1zyuEnI_O3X_7U94GIQ-qq2XebC1C2phzNdTtgTUH8KtL5MCixw6-FMDHL3ouzXpK2AmUnAAGmJaW4DXGmasfIHzNBHmNuX98kMlDH5zmVTzvbcU0zBmsm_WRpACN67MNTetSHENJ-k0svEWGixRa3krNgcQytiZzI3T-kuybTD4EkwWQSHLsBy2JH-o7wRmYkiMs58VaMGy2QnYZi_BATN1EzcXCFg"
     AGENT_ID = "693448f6231659c2a32a3bca"
     LOCATION_ID = "M5jnxd1r8yq3o5gxSYOP"
     FROM_PHONE = "+18439407924"
     
     # Phone number to call
-    TO_PHONE = "+16135189745"  # Change this to your target number
+    TO_PHONE = ""  # Change this to your target number
     
     # Make the call
     result = make_trial_call(
@@ -100,3 +99,7 @@ if __name__ == "__main__":
     )
     
     print(f"\n Final Result: {json.dumps(result, indent=2)}")
+
+
+
+
