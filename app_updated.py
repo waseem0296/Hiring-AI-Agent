@@ -493,8 +493,8 @@ class HiringWorkflowOrchestrator:
             interval = self.config.get('poll_interval_seconds', 10)
             
             # Extract call ID (support both conversationId and id)
-            call_id = call_result.get("conversationId") or call_result.get("id") or call_result.get("callId")
-            
+            call_id = call_result.get("_id") or call_result.get("id") or call_result.get("callId")
+            print("The call id is:", call_id)
             if not call_id:
                 print(f"❌ Could not extract Call ID from response: {call_result}")
                 return None
@@ -902,7 +902,8 @@ class HiringWorkflowOrchestrator:
 # //////////////////  must uncomment this line to make call///////////
             # Step 1B: Make call and wait for completion
             completed_call = self.step1b_make_call_and_wait(candidate)
-            completed_call = True
+            # completed_call = True
+
             if not completed_call:
                 print(f"\n Call did not complete for candidate {current_candidate_id}")
                 print("   Skipping to next candidate...")
@@ -958,9 +959,9 @@ class HiringWorkflowOrchestrator:
 from applicant_id_fetcher import get_applicants_info
 if __name__ == "__main__":
     print("New execution started")
-    jwt = "eyJhbGciOiJSUzI1NiIsImtpZCI6IlJNblFlZmkwZFB5emRIdFR0Z2xrVmdFWGp0SHFzSEFkb0Jjbi1nMjJJb1UiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJiMWUwZTc4Yy05MGU3LTQxOTgtOTU5NC0zMDI3ZWZkN2Y3MTAiLCJpc3MiOiJodHRwczovL2FjY291bnRzLmhpcmVvbG9neS5jb20vNDZlODJkZWEtOTFmNC00ZDMwLWFhYmMtYWMxZWUwMzBiZWMyL3YyLjAvIiwiZXhwIjoxNzY3Mzg5MzE0LCJuYmYiOjE3NjczODU3MTQsInN1YiI6IjIzMGE5NjZhLTc4Y2ItNGMzOS1hZGEzLTdlODkyNWNjNmQ5MSIsIm9pZCI6IjIzMGE5NjZhLTc4Y2ItNGMzOS1hZGEzLTdlODkyNWNjNmQ5MSIsInRpZCI6IjQ2ZTgyZGVhLTkxZjQtNGQzMC1hYWJjLWFjMWVlMDMwYmVjMiIsImttc2kiOiJGYWxzZSIsInNjcCI6InYyIGFpIHYzIiwiYXpwIjoiZjA2N2U2YTMtODE1ZC00MTNkLTg3OGUtZDIyM2VmYWEwY2E0IiwidmVyIjoiMS4wIiwiaWF0IjoxNzY3Mzg1NzE0fQ.yMensq968mJ6hafEHFXUdXsFEwsgzWp9OOfwfGINCCw1zXEuRNysSiHdxTilkeQFLAiT82YM1lpFb-A1iIKSPKUVpu0k274V8q7KI8VzxPbqXtjDdHnccnn41Wh0Ncsr2W-2dl0_gUSPy1EL3j1OI4Xie1L-QezJBIZlDUap_icqrujBt0SHSzq-LJ8F-zQ8ORZMMrY4tnDhyaG6C6EET7aoWPJ04g0Txw6XLnz7lB55tRh8oT9xtFePBkVTV2z22xVQV5MwQ8svT0rWM9JvtPG-Yo2CN6fmt-LbLjrVVHPeS8u0rCyFgsKtE_SHkrLrDs8EOu0dYVtj4s4N9Rs0lw"
+    jwt = "eyJhbGciOiJSUzI1NiIsImtpZCI6IlJNblFlZmkwZFB5emRIdFR0Z2xrVmdFWGp0SHFzSEFkb0Jjbi1nMjJJb1UiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJiMWUwZTc4Yy05MGU3LTQxOTgtOTU5NC0zMDI3ZWZkN2Y3MTAiLCJpc3MiOiJodHRwczovL2FjY291bnRzLmhpcmVvbG9neS5jb20vNDZlODJkZWEtOTFmNC00ZDMwLWFhYmMtYWMxZWUwMzBiZWMyL3YyLjAvIiwiZXhwIjoxNzY3NDU3NzgyLCJuYmYiOjE3Njc0NTQxODIsInN1YiI6IjIzMGE5NjZhLTc4Y2ItNGMzOS1hZGEzLTdlODkyNWNjNmQ5MSIsIm9pZCI6IjIzMGE5NjZhLTc4Y2ItNGMzOS1hZGEzLTdlODkyNWNjNmQ5MSIsInRpZCI6IjQ2ZTgyZGVhLTkxZjQtNGQzMC1hYWJjLWFjMWVlMDMwYmVjMiIsImttc2kiOiJGYWxzZSIsInNjcCI6InYyIGFpIHYzIiwiYXpwIjoiZjA2N2U2YTMtODE1ZC00MTNkLTg3OGUtZDIyM2VmYWEwY2E0IiwidmVyIjoiMS4wIiwiaWF0IjoxNzY3NDU0MTgyfQ.opKXNYcF87ylQ5ZRMdEkKLqMBviYCVRDxIhDCSRyKT9LL8RF9a2dNQ32IEZp8-qpuU_S26Jz_PqFZCrQGuJx5eIznpHGYii06d-pbTeM30_wympafBg5k-z8tw13dPnf-bpLPpRCP1_KvvaQqgNBf45_ulgZ3vr81Dt63vqB5pNIwl3_gZtOybbh4WPYXnFOteE-OdfL98QS-Q5eEVPmPFvbD_4k0TZEAPaiBrAZNtK7uuZyblAXSWTv1cI-TIpzFEnkHIa04H6kng-NdzRPXUqVbofKM-8FjkDK0dRp82VQVZFtRa0gXySWcNVPtzhlefUEatD4Ab-FpCvO2gL8qg"
     job_id = "2606114"
-    ghl_token_id = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImEzOGVhNmEwNDA4YjBjYzVkYTE4OWRmYzg4ODgyZDBmMWI3ZmJmMGUiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoiaVJHOGdKSzI3MFBoUENSQlE3OUMiLCJjb21wYW55X2lkIjoiM2s4Wlh3VjNxVUZVU0JubjlSbDAiLCJyb2xlIjoiYWRtaW4iLCJ0eXBlIjoiYWNjb3VudCIsInZlcnNpb24iOjIsImxvY2F0aW9ucyI6WyJNNWpueGQxcjh5cTNvNWd4U1lPUCJdLCJwZXJtaXNzaW9ucyI6eyJ3b3JrZmxvd3NfZW5hYmxlZCI6dHJ1ZSwid29ya2Zsb3dzX3JlYWRfb25seSI6ZmFsc2V9LCJwcmltYXJ5VXNlciI6e30sImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9oaWdobGV2ZWwtYmFja2VuZCIsImF1ZCI6ImhpZ2hsZXZlbC1iYWNrZW5kIiwiYXV0aF90aW1lIjoxNzY3MzY5MzM3LCJzdWIiOiJpUkc4Z0pLMjcwUGhQQ1JCUTc5QyIsImlhdCI6MTc2NzM4NjQwMSwiZXhwIjoxNzY3MzkwMDAxLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7fSwic2lnbl9pbl9wcm92aWRlciI6ImN1c3RvbSJ9fQ.5JOZDuBkoKMujGChOUoup9fFjBKkAayYAlJVs-rRai0HKG5hxQ3rUs1kvpljBQ3EQY334yeSi767zjFJk8IMDhRvqGrCehaxkcyp7WcqDdvNJ_KBmIhHy-JiCU_FsKMWzGURwYwC-MjklH36nZw-N7eEwaqp_UVSlTaGNOqrLqLXRf6LUgAr0_FR9SIXThUnZdf0iVmjxtGWXmyY7NglY_QgDRURR1wIuNg95WBivC3qMrM2fCvZhpKyYJCYsU-tOZ6l551wEF-OqNOULnf77MC03dVTJMCHWEAUy3zGG41JAl4Ao_RxA8eQidnsjw7BbaRniouyt70jkPCJXuIdag"
+    ghl_token_id = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImEzOGVhNmEwNDA4YjBjYzVkYTE4OWRmYzg4ODgyZDBmMWI3ZmJmMGUiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoiaVJHOGdKSzI3MFBoUENSQlE3OUMiLCJjb21wYW55X2lkIjoiM2s4Wlh3VjNxVUZVU0JubjlSbDAiLCJyb2xlIjoiYWRtaW4iLCJ0eXBlIjoiYWNjb3VudCIsInZlcnNpb24iOjIsImxvY2F0aW9ucyI6WyJNNWpueGQxcjh5cTNvNWd4U1lPUCJdLCJwZXJtaXNzaW9ucyI6eyJ3b3JrZmxvd3NfZW5hYmxlZCI6dHJ1ZSwid29ya2Zsb3dzX3JlYWRfb25seSI6ZmFsc2V9LCJwcmltYXJ5VXNlciI6e30sImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9oaWdobGV2ZWwtYmFja2VuZCIsImF1ZCI6ImhpZ2hsZXZlbC1iYWNrZW5kIiwiYXV0aF90aW1lIjoxNzY3NDQ3NDMwLCJzdWIiOiJpUkc4Z0pLMjcwUGhQQ1JCUTc5QyIsImlhdCI6MTc2NzQ1NDAzMiwiZXhwIjoxNzY3NDU3NjMyLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7fSwic2lnbl9pbl9wcm92aWRlciI6ImN1c3RvbSJ9fQ.G47yQU4Uj1CCKGCnPKBBE2FMQHAUs8BD3p43X2OsKv2T_ucuwMt9dQecWW4Lo5U4NeHCn3bh3jMjrSpa75-l4vLwLawDgahCJAYeQRtm1qs2jLkDQc3xwJFygblRsBdg_i-C-frVUsAneMPkwaM84o64NVN-AevLiMu-ya9zdttDh3OIybbFRfkTLT58kLcQJA0EOwPlUWBPRWy1scUqXGzQ4-XHrSVxrcRiSxItf9utpACp9Owur8-G02KGtaAE4NLAs3kJZ7JBTqvTGQ17OxXw27e8xomaBMpKlwp6eDPHtA5fPoXJSQlcwyXu9mfTAtHg0QztvQ4KpVl_R6qtOw"
     print("\n" + "="*80)
     print("Fetching applicants...")
     print("="*80)

@@ -1,23 +1,31 @@
 {
-  "timestamp": "2026-01-03T02:25:44.675982",
+  "timestamp": "2026-01-03T20:52:44.740728",
   "steps_completed": [
     "step1_screening",
     "step2_interview_processing",
     "step3_interview_update"
   ],
   "errors": [],
-  "candidates_called": [],
+  "candidates_called": [
+    {
+      "candidate_id": 47263081,
+      "phone": "+16135189745",
+      "call_id": null,
+      "duration": null,
+      "status": "completed"
+    }
+  ],
   "screened_applicants": [
     {
-      "candidate_id": 47250325,
-      "candidate_job_id": 58178866,
-      "email": "basil+48@dawsonhomecare.com",
+      "candidate_id": 47263081,
+      "candidate_job_id": 58194807,
+      "email": "basil+51@dawsonhomecare.com",
       "status": "Candidate",
       "record": {
-        "candidate_id": 47250325,
+        "candidate_id": 47263081,
         "first_name": "Basil",
-        "last_name": "test48",
-        "email": "basil+48@dawsonhomecare.com",
+        "last_name": "test51",
+        "email": "basil+51@dawsonhomecare.com",
         "phone_number": "+16135189745",
         "address": "536 Joe Frazier rd",
         "city": "Beaufort",
@@ -25,33 +33,33 @@
         "zip_code": "29906",
         "job_name": "Job Simulation Please Dont Use this (TEST)",
         "status": "Applicant",
-        "applied_at": "2026-01-02T21:22:57.913Z",
-        "What was/ is your most recent pay rate?": "23",
-        "Which hands-on caregiving tasks have you independently performed?": "iii",
-        "What is your availability to start? Immediately or within a required timeframe?": "im",
-        "Have you worked in an assisted living or long-term care facility before?": "uuu",
-        "Can you briefly describe your previous caregiving roles, including your main responsibilities and the care settings you worked in?": "no",
+        "applied_at": "2026-01-03T15:12:10.519Z",
+        "What was/ is your most recent pay rate?": "12",
+        "Which hands-on caregiving tasks have you independently performed?": "r",
+        "What is your availability to start? Immediately or within a required timeframe?": "t",
+        "Have you worked in an assisted living or long-term care facility before?": "y",
+        "Can you briefly describe your previous caregiving roles, including your main responsibilities and the care settings you worked in?": "ty",
         "Do you currently hold any caregiving-related certifications (CNA, PCT, LPN, RN, MedTech, etc.)?": "no",
         "How many years of professional caregiving experience do you have?": "2",
         "Do you have a valid driver's license, and car insurance?": "yes",
-        "Are you able to pass a drug screen?": "yes",
+        "Are you able to pass a drug screen?": "yes\r\n",
         "Have you been arrested, convicted of a felony, or misdemeanor?": "no",
-        "Please provide the contact name and phone number of 2-3 former supervisors. *Cannot be co-workers, family, or friends*": "Mr. Smith +16135189745 Mr. Smith +16135189745"
+        "Please provide the contact name and phone number of 2-3 former supervisors. *Cannot be co-workers, family, or friends*": "Mr Smith +16135189745 Mr Smith +16135189745"
       },
       "phone": "+16135189745"
     }
   ],
   "candidates_to_call": [
     {
-      "candidate_id": 47250325,
-      "candidate_job_id": 58178866,
-      "email": "basil+48@dawsonhomecare.com",
+      "candidate_id": 47263081,
+      "candidate_job_id": 58194807,
+      "email": "basil+51@dawsonhomecare.com",
       "status": "Candidate",
       "record": {
-        "candidate_id": 47250325,
+        "candidate_id": 47263081,
         "first_name": "Basil",
-        "last_name": "test48",
-        "email": "basil+48@dawsonhomecare.com",
+        "last_name": "test51",
+        "email": "basil+51@dawsonhomecare.com",
         "phone_number": "+16135189745",
         "address": "536 Joe Frazier rd",
         "city": "Beaufort",
@@ -59,28 +67,28 @@
         "zip_code": "29906",
         "job_name": "Job Simulation Please Dont Use this (TEST)",
         "status": "Applicant",
-        "applied_at": "2026-01-02T21:22:57.913Z",
-        "What was/ is your most recent pay rate?": "23",
-        "Which hands-on caregiving tasks have you independently performed?": "iii",
-        "What is your availability to start? Immediately or within a required timeframe?": "im",
-        "Have you worked in an assisted living or long-term care facility before?": "uuu",
-        "Can you briefly describe your previous caregiving roles, including your main responsibilities and the care settings you worked in?": "no",
+        "applied_at": "2026-01-03T15:12:10.519Z",
+        "What was/ is your most recent pay rate?": "12",
+        "Which hands-on caregiving tasks have you independently performed?": "r",
+        "What is your availability to start? Immediately or within a required timeframe?": "t",
+        "Have you worked in an assisted living or long-term care facility before?": "y",
+        "Can you briefly describe your previous caregiving roles, including your main responsibilities and the care settings you worked in?": "ty",
         "Do you currently hold any caregiving-related certifications (CNA, PCT, LPN, RN, MedTech, etc.)?": "no",
         "How many years of professional caregiving experience do you have?": "2",
         "Do you have a valid driver's license, and car insurance?": "yes",
-        "Are you able to pass a drug screen?": "yes",
+        "Are you able to pass a drug screen?": "yes\r\n",
         "Have you been arrested, convicted of a felony, or misdemeanor?": "no",
-        "Please provide the contact name and phone number of 2-3 former supervisors. *Cannot be co-workers, family, or friends*": "Mr. Smith +16135189745 Mr. Smith +16135189745"
+        "Please provide the contact name and phone number of 2-3 former supervisors. *Cannot be co-workers, family, or friends*": "Mr Smith +16135189745 Mr Smith +16135189745"
       },
       "phone": "+16135189745"
     }
   ],
-  "interview_json_path": "call_data\\hireology_qa_20260103_022606.json",
+  "interview_json_path": "call_data\\hireology_qa_20260103_205740.json",
   "qa_pairs_count": 17,
-  "interview_id": "49746577",
-  "candidate_id": 47250325,
-  "interview_score": 93,
-  "confidence_score": 100,
+  "interview_id": "49758588",
+  "candidate_id": 47263081,
+  "interview_score": 96,
+  "confidence_score": 91,
   "interview_updated": true,
   "matched_questions": 11
 }
