@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-09T21:27:07.636907",
+  "timestamp": "2026-01-09T22:51:13.292770",
   "steps_completed": [
     "step1_screening",
     "step2_interview_processing",
@@ -8,7 +8,7 @@
   "errors": [],
   "candidates_called": [
     {
-      "candidate_id": 47416045,
+      "candidate_id": 47418479,
       "phone": "+16135189745",
       "call_id": null,
       "duration": null,
@@ -17,15 +17,15 @@
   ],
   "screened_applicants": [
     {
-      "candidate_id": 47416045,
-      "candidate_job_id": 58387060,
-      "email": "basil+62@dawsonhomecare.com",
+      "candidate_id": 47418479,
+      "candidate_job_id": 58390135,
+      "email": "basil+64@dawsonhomecare.com",
       "status": "Candidate",
       "record": {
-        "candidate_id": 47416045,
+        "candidate_id": 47418479,
         "first_name": "Basil",
-        "last_name": "test62",
-        "email": "basil+62@dawsonhomecare.com",
+        "last_name": "test64",
+        "email": "basil+64@dawsonhomecare.com",
         "phone_number": "+16135189745",
         "address": "536 Joe Frazier rd",
         "city": "Beaufort",
@@ -33,33 +33,33 @@
         "zip_code": "29906",
         "job_name": "Job Simulation Please Dont Use this (TEST)",
         "status": "Applicant",
-        "applied_at": "2026-01-09T16:06:33.772Z",
-        "What was/ is your most recent pay rate?": "dd",
-        "Which hands-on caregiving tasks have you independently performed?": "we",
+        "applied_at": "2026-01-09T17:38:59.908Z",
+        "What was/ is your most recent pay rate?": "23",
+        "Which hands-on caregiving tasks have you independently performed?": "yes",
         "What is your availability to start? Immediately or within a required timeframe?": "im",
-        "Have you worked in an assisted living or long-term care facility before?": "wq",
-        "Can you briefly describe your previous caregiving roles, including your main responsibilities and the care settings you worked in?": "wed2",
+        "Have you worked in an assisted living or long-term care facility before?": "yes",
+        "Can you briefly describe your previous caregiving roles, including your main responsibilities and the care settings you worked in?": "hj",
         "Do you currently hold any caregiving-related certifications (CNA, PCT, LPN, RN, MedTech, etc.)?": "no",
         "How many years of professional caregiving experience do you have?": "2",
         "Do you have a valid driver's license, and car insurance?": "yes",
         "Are you able to pass a drug screen?": "yes",
         "Have you been arrested, convicted of a felony, or misdemeanor?": "no",
-        "Please provide the contact name and phone number of 2-3 former supervisors. *Cannot be co-workers, family, or friends*": "Mr smith +16135189745 Mr smith +16135189745"
+        "Please provide the contact name and phone number of 2-3 former supervisors. *Cannot be co-workers, family, or friends*": "Mr Smith +16135189745 Mr Smith +16135189745"
       },
       "phone": "+16135189745"
     }
   ],
   "candidates_to_call": [
     {
-      "candidate_id": 47416045,
-      "candidate_job_id": 58387060,
-      "email": "basil+62@dawsonhomecare.com",
+      "candidate_id": 47418479,
+      "candidate_job_id": 58390135,
+      "email": "basil+64@dawsonhomecare.com",
       "status": "Candidate",
       "record": {
-        "candidate_id": 47416045,
+        "candidate_id": 47418479,
         "first_name": "Basil",
-        "last_name": "test62",
-        "email": "basil+62@dawsonhomecare.com",
+        "last_name": "test64",
+        "email": "basil+64@dawsonhomecare.com",
         "phone_number": "+16135189745",
         "address": "536 Joe Frazier rd",
         "city": "Beaufort",
@@ -67,28 +67,28 @@
         "zip_code": "29906",
         "job_name": "Job Simulation Please Dont Use this (TEST)",
         "status": "Applicant",
-        "applied_at": "2026-01-09T16:06:33.772Z",
-        "What was/ is your most recent pay rate?": "dd",
-        "Which hands-on caregiving tasks have you independently performed?": "we",
+        "applied_at": "2026-01-09T17:38:59.908Z",
+        "What was/ is your most recent pay rate?": "23",
+        "Which hands-on caregiving tasks have you independently performed?": "yes",
         "What is your availability to start? Immediately or within a required timeframe?": "im",
-        "Have you worked in an assisted living or long-term care facility before?": "wq",
-        "Can you briefly describe your previous caregiving roles, including your main responsibilities and the care settings you worked in?": "wed2",
+        "Have you worked in an assisted living or long-term care facility before?": "yes",
+        "Can you briefly describe your previous caregiving roles, including your main responsibilities and the care settings you worked in?": "hj",
         "Do you currently hold any caregiving-related certifications (CNA, PCT, LPN, RN, MedTech, etc.)?": "no",
         "How many years of professional caregiving experience do you have?": "2",
         "Do you have a valid driver's license, and car insurance?": "yes",
         "Are you able to pass a drug screen?": "yes",
         "Have you been arrested, convicted of a felony, or misdemeanor?": "no",
-        "Please provide the contact name and phone number of 2-3 former supervisors. *Cannot be co-workers, family, or friends*": "Mr smith +16135189745 Mr smith +16135189745"
+        "Please provide the contact name and phone number of 2-3 former supervisors. *Cannot be co-workers, family, or friends*": "Mr Smith +16135189745 Mr Smith +16135189745"
       },
       "phone": "+16135189745"
     }
   ],
-  "interview_json_path": "call_data\\hireology_qa_20260109_220134.json",
+  "interview_json_path": "call_data\\hireology_qa_20260109_225457.json",
   "qa_pairs_count": 17,
-  "interview_id": "49909460",
-  "candidate_id": 47416045,
-  "interview_score": 96,
-  "confidence_score": 91,
+  "interview_id": "49910790",
+  "candidate_id": 47418479,
+  "interview_score": 93,
+  "confidence_score": 100,
   "interview_updated": true,
   "matched_questions": 11
 }
