@@ -123,21 +123,27 @@ def update_interview_answers(local_json_path: str, interview_data: Dict) -> tupl
                         break
 
         if matched_question:
-            # Special handling for "How did you hear about us?" (Q9)
-            if "Reason for Applying" in matched_question.get('prompt', '') or "hear about us" in matched_question.get('prompt', '').lower():
-                if answer_text in ['N/A', '', None] or (isinstance(answer_text, str) and not answer_text.strip()):
-                    answer_text = "Linkedin"
-                    print("   ℹ️  Defaulting source to 'Linkedin'")
-                rating = "Good" # Force rating
-            
-            # Check if answer is N/A or empty
-            is_no_answer = answer_text in ['N/A', '', None] or (isinstance(answer_text, str) and answer_text.strip() == '')
-            
+            prompt = matched_question.get('prompt', '')
+            # Special handling
+            if "Reason for Applying" in prompt or "hear about us" in prompt.lower():
+                if answer_text in ['N/A', '', None] or (
+                        isinstance(answer_text, str) and not answer_text.strip()
+                    ):
+                        answer_text = "LinkedIn"
+                        print("     Defaulting source to 'LinkedIn'")
+                rating = "Good"
+
+            # Generic empty check (after defaulting)
+            is_no_answer = answer_text in ['N/A', '', None] or (
+                isinstance(answer_text, str) and not answer_text.strip()
+            )
+
             if is_no_answer:
                 matched_question['text_answer'] = ''
                 rating = 'Skipped'
             else:
                 matched_question['text_answer'] = answer_text
+
             
             # Update rating selection
             rating_info = map_rating_to_answer(rating)
@@ -224,30 +230,37 @@ def update_interview_answers(local_json_path: str, interview_data: Dict) -> tupl
 
             # Special Handling for Job Search / Deal Breakers (Q10) if unmatched
             q_prompt = question.get('prompt', '').lower()
+
             if "job search" in q_prompt and ("important" in q_prompt or "deal-breakers" in q_prompt):
-                print("   ℹ️  Defaulting Job Search Preferences (Standard Default)")
-                
-                # Apply defaults
-                existing_answer = "I look for growth and a healthy work environment."
-                selected_answer = "Good"
-                
-                # Update the question object so it sends correctly
+                print("    Handling Job Search / Deal-Breakers (Q10)")
+
+                existing_answer = question.get('text_answer')
+
+                # Apply default ONLY if empty or None
+                if existing_answer is None or (
+                    isinstance(existing_answer, str) and not existing_answer.strip()
+                ):
+                    existing_answer = "I look for growth and a healthy work environment."
+                    print("   ℹ️  Defaulting Job Search answer")
+
                 question['text_answer'] = existing_answer
-                
-                # Set selection in answers array
+
+                # Rating logic (always Good, or adjust if needed)
+                selected_answer = "Good"
+
                 rating_info = map_rating_to_answer(selected_answer)
                 for answer in question.get('answers', []):
                     answer['selected'] = (answer['name'] == rating_info['name'])
-                
+
                 log_entry = {
                     'question': question.get('prompt'),
                     'answer': existing_answer,
                     'rating': selected_answer,
                     'question_id': question.get('id'),
-                    'matched': True, # Mark as matched since we handled it
+                    'matched': True,
                     'order': question.get('order', 0)
                 }
-                # Add to update logs so it counts as "Matched & Updated"
+
                 update_logs.append(log_entry)
                 matched_question_ids.add(question.get('id'))
                 continue

@@ -961,11 +961,11 @@ from Hireology_login.login import get_hireology_token
 from GHL_login.ghl_login_full import get_gohighlevel_token
 if __name__ == "__main__":
     print("New execution started")
-    jwt = get_hireology_token()
+    jwt =get_hireology_token()
     print("The extracted tken is :",jwt)
     job_id = "2606114"
     
-    ghl_token_id = get_gohighlevel_token()
+    ghl_token_id =get_gohighlevel_token()
     print("The extracted ghl token is :", ghl_token_id)
     print("\n" + "="*80)
     print("Fetching applicants...")

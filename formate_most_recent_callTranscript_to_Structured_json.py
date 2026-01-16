@@ -38,7 +38,9 @@ class HireologyQAExtractor:
             "Experience using a Sliding board?",
             "Experience with Total Care Clients and/or bedridden clients?",
             "Experience giving bed baths, changing the client in bed, turning, repositioning, and changing sheets of a bedridden client?",
-            "Experience emptying foley catheters and male condom catheters?"
+            "Experience emptying foley catheters and male condom catheters?",
+            "How did you hear about us?",
+            "As you go through your job search, what things do you consider to be most important? What are some deal-breakers?"
         ]
     
     def get_call_logs(self, agent_id=None):
@@ -56,6 +58,142 @@ class HireologyQAExtractor:
             print(f"Error fetching call logs: {e}")
             return None
     
+    # def parse_transcript_to_dict(self, transcript):
+    #     """
+    #     Parse transcript into a dictionary of questions and answers.
+    #     Robustly handles:
+    #     - Merged questions (e.g. "Do you have X? [no pause] Can you do Y?")
+    #     - Interrupted questions (no '?' before human answers)
+    #     - Multi-turn answers
+    #     - Lines missing 'bot:' or 'human:' prefixes (assumed continuation)
+    #     """
+    #     lines = transcript.split('\n')
+    #     qa_dict = {}
+    #     last_question = None
+    #     last_speaker = None  # 'bot' or 'human'
+        
+    #     # Buffer for current bot output that hasn't been finalized into a question yet
+    #     current_bot_buffer = ""
+        
+    #     # Phrases that clearly indicate a NEW question starting
+    #     # Used to force-split if multiple questions are glued together
+    #     question_starters = [
+    #         "can you", "do you", "what", "how", "why", "are you", "is there", 
+    #         "tell me", "have you"
+    #     ]
+        
+    #     # Ignore short filler phrases if they end up as standalone "questions"
+    #     ignore_phrases = [
+    #         "thank you", "got it", "great", "ok", "alright", "hello", "hi", 
+    #         "ready to begin", "let's get started", "call is recorded"
+    #     ]
+        
+    #     for line in lines:
+    #         line = line.strip()
+    #         if not line: continue
+            
+    #         # Determine speaker and text
+    #         if line.startswith('bot:'):
+    #             speaker = 'bot'
+    #             text = line[4:].strip()
+    #         elif line.startswith('human:'):
+    #             speaker = 'human'
+    #             text = line[6:].strip()
+    #         else:
+    #             # No prefix - assume continuation of last speaker
+    #             # If no last speaker (start of file), skip or assume bot?
+    #             if last_speaker:
+    #                 speaker = last_speaker
+    #                 text = line
+    #             else:
+    #                 continue
+            
+    #         last_speaker = speaker
+            
+    #         if speaker == 'bot':
+    #             text_lower = text.lower()
+                
+    #             # Check for FORCE SPLIT: 
+    #             # If we already have significant text in buffer, and this new line 
+    #             # starts with a capitalized Question Starter, assume previous question ended.
+    #             is_new_start = any(text_lower.startswith(s) for s in question_starters)
+                
+    #             # If buffer has "Do you have certifications" and new line is "Can you name...", split!
+    #             if current_bot_buffer and is_new_start and len(current_bot_buffer) > 10:
+    #                  q_text = current_bot_buffer.strip()
+    #                  # Only register as question if it's not just "Thank you"
+    #                  if not any(q_text.lower() == p for p in ignore_phrases):
+    #                      if q_text not in qa_dict:
+    #                          qa_dict[q_text] = ""
+    #                      last_question = q_text
+    #                  current_bot_buffer = ""
+                
+    #             current_bot_buffer += " " + text
+                
+    #             # Now check for standard '?' splits
+    #             if '?' in current_bot_buffer:
+    #                 parts = current_bot_buffer.split('?')
+                    
+    #                 # Process all complete segments
+    #                 for i in range(len(parts) - 1):
+    #                     q_candidate = parts[i].strip() + '?'
+                        
+    #                     # Filter out pure filler "questions" like "Ready to begin?" if strictly filler
+    #                     q_clean = q_candidate.lower().strip()
+    #                     is_filler = any(phrase in q_clean for phrase in ignore_phrases) and len(q_clean) < 20
+                        
+    #                     if len(q_candidate) > 5 and not is_filler:
+    #                          if q_candidate not in qa_dict:
+    #                              qa_dict[q_candidate] = ""
+    #                          last_question = q_candidate
+                    
+    #                 # The remainder stays in buffer (start of next sentence)
+    #                 current_bot_buffer = parts[-1]
+            
+    #         elif speaker == 'human':
+    #             ans = text
+    #             if not ans: continue
+                
+    #             # CRITICAL FIX: If human answers and we have a "pending" bot buffer 
+    #             # that hasn't been finalized (e.g. "Do you have certifications" with no '?'),
+    #             # treat that buffer as the question IMMEDIATELY.
+    #             if current_bot_buffer.strip() and len(current_bot_buffer) > 10:
+    #                 q_candidate = current_bot_buffer.strip()
+    #                 # Check if it looks like a question (contains question words) or is long enough
+    #                 has_q_word = any(w in q_candidate.lower() for w in question_starters)
+                    
+    #                 if has_q_word or len(q_candidate) > 20: 
+    #                     if q_candidate not in qa_dict:
+    #                         qa_dict[q_candidate] = ""
+    #                     last_question = q_candidate
+    #                     current_bot_buffer = "" # Consumed
+                
+    #             # Attach answer to the most recent identified question
+    #             if last_question:
+    #                 # Ignore "inaudible speech" if we already have an answer
+    #                 # But don't ignore it if it's the ONLY answer
+    #                 is_inaudible = ans.lower() == "(inaudible speech)"
+    #                 if is_inaudible and qa_dict[last_question]:
+    #                     continue
+                        
+    #                 if qa_dict[last_question]:
+    #                     qa_dict[last_question] += " " + ans
+    #                 else:
+    #                     qa_dict[last_question] = ans
+        
+    #     # Final cleanup: Remove purely empty questions or distinct non-questions
+    #     final_dict = {}
+    #     for q, a in qa_dict.items():
+    #         # Check if q is just filler text
+    #         q_lower = q.lower()
+    #         is_filler = any(q_lower == p or q_lower == p+"." for p in ignore_phrases)
+    #         if not is_filler and len(q) > 5:
+    #             # Clean up the key string
+    #             final_dict[q] = a.strip()
+                
+    #     return final_dict
+    
+
     def parse_transcript_to_dict(self, transcript):
         """
         Parse transcript into a dictionary of questions and answers.
@@ -64,6 +202,7 @@ class HireologyQAExtractor:
         - Interrupted questions (no '?' before human answers)
         - Multi-turn answers
         - Lines missing 'bot:' or 'human:' prefixes (assumed continuation)
+        - Human requests to repeat questions (filters out and waits for actual answer)
         """
         lines = transcript.split('\n')
         qa_dict = {}
@@ -76,19 +215,27 @@ class HireologyQAExtractor:
         # Phrases that clearly indicate a NEW question starting
         # Used to force-split if multiple questions are glued together
         question_starters = [
-            "can you", "do you", "what", "how", "why", "are you", "is there", 
+            "can you", "do you", "what", "how", "why", "are you", "is there",
             "tell me", "have you"
         ]
         
         # Ignore short filler phrases if they end up as standalone "questions"
         ignore_phrases = [
-            "thank you", "got it", "great", "ok", "alright", "hello", "hi", 
+            "thank you", "got it", "great", "ok", "alright", "hello", "hi",
             "ready to begin", "let's get started", "call is recorded"
+        ]
+        
+        # NEW: Phrases indicating human is asking to repeat the question
+        repeat_request_phrases = [
+            "can you repeat", "please repeat", "repeat the question", 
+            "say that again", "could you repeat", "what was the question",
+            "come again", "pardon", "sorry", "what did you say"
         ]
         
         for line in lines:
             line = line.strip()
-            if not line: continue
+            if not line:
+                continue
             
             # Determine speaker and text
             if line.startswith('bot:'):
@@ -111,60 +258,68 @@ class HireologyQAExtractor:
             if speaker == 'bot':
                 text_lower = text.lower()
                 
-                # Check for FORCE SPLIT: 
-                # If we already have significant text in buffer, and this new line 
+                # Check for FORCE SPLIT:
+                # If we already have significant text in buffer, and this new line
                 # starts with a capitalized Question Starter, assume previous question ended.
                 is_new_start = any(text_lower.startswith(s) for s in question_starters)
                 
                 # If buffer has "Do you have certifications" and new line is "Can you name...", split!
                 if current_bot_buffer and is_new_start and len(current_bot_buffer) > 10:
-                     q_text = current_bot_buffer.strip()
-                     # Only register as question if it's not just "Thank you"
-                     if not any(q_text.lower() == p for p in ignore_phrases):
-                         if q_text not in qa_dict:
-                             qa_dict[q_text] = ""
-                         last_question = q_text
-                     current_bot_buffer = ""
+                    q_text = current_bot_buffer.strip()
+                    # Only register as question if it's not just "Thank you"
+                    if not any(q_text.lower() == p for p in ignore_phrases):
+                        if q_text not in qa_dict:
+                            qa_dict[q_text] = ""
+                        last_question = q_text
+                    current_bot_buffer = ""
                 
                 current_bot_buffer += " " + text
                 
                 # Now check for standard '?' splits
                 if '?' in current_bot_buffer:
                     parts = current_bot_buffer.split('?')
-                    
                     # Process all complete segments
                     for i in range(len(parts) - 1):
                         q_candidate = parts[i].strip() + '?'
-                        
                         # Filter out pure filler "questions" like "Ready to begin?" if strictly filler
                         q_clean = q_candidate.lower().strip()
                         is_filler = any(phrase in q_clean for phrase in ignore_phrases) and len(q_clean) < 20
                         
                         if len(q_candidate) > 5 and not is_filler:
-                             if q_candidate not in qa_dict:
-                                 qa_dict[q_candidate] = ""
-                             last_question = q_candidate
+                            if q_candidate not in qa_dict:
+                                qa_dict[q_candidate] = ""
+                            # ALWAYS update last_question, even if question already exists
+                            # This ensures answers are captured when bot repeats a question
+                            last_question = q_candidate
                     
                     # The remainder stays in buffer (start of next sentence)
                     current_bot_buffer = parts[-1]
             
             elif speaker == 'human':
                 ans = text
-                if not ans: continue
+                if not ans:
+                    continue
                 
-                # CRITICAL FIX: If human answers and we have a "pending" bot buffer 
+                # NEW: Check if human is asking to repeat the question
+                ans_lower = ans.lower()
+                is_repeat_request = any(phrase in ans_lower for phrase in repeat_request_phrases)
+                
+                # If it's a repeat request, skip adding it to the answer
+                if is_repeat_request:
+                    continue
+                
+                # CRITICAL FIX: If human answers and we have a "pending" bot buffer
                 # that hasn't been finalized (e.g. "Do you have certifications" with no '?'),
                 # treat that buffer as the question IMMEDIATELY.
                 if current_bot_buffer.strip() and len(current_bot_buffer) > 10:
                     q_candidate = current_bot_buffer.strip()
                     # Check if it looks like a question (contains question words) or is long enough
                     has_q_word = any(w in q_candidate.lower() for w in question_starters)
-                    
-                    if has_q_word or len(q_candidate) > 20: 
+                    if has_q_word or len(q_candidate) > 20:
                         if q_candidate not in qa_dict:
                             qa_dict[q_candidate] = ""
                         last_question = q_candidate
-                        current_bot_buffer = "" # Consumed
+                        current_bot_buffer = ""  # Consumed
                 
                 # Attach answer to the most recent identified question
                 if last_question:
@@ -173,24 +328,124 @@ class HireologyQAExtractor:
                     is_inaudible = ans.lower() == "(inaudible speech)"
                     if is_inaudible and qa_dict[last_question]:
                         continue
-                        
+                    
                     if qa_dict[last_question]:
                         qa_dict[last_question] += " " + ans
                     else:
                         qa_dict[last_question] = ans
         
         # Final cleanup: Remove purely empty questions or distinct non-questions
+        # AND merge similar questions (when bot repeats with slightly different wording)
+        # AND merge follow-up fragments (when bot splits one question into multiple parts)
         final_dict = {}
+        
+        # First pass: collect all valid questions
+        valid_questions = []
         for q, a in qa_dict.items():
-            # Check if q is just filler text
             q_lower = q.lower()
             is_filler = any(q_lower == p or q_lower == p+"." for p in ignore_phrases)
             if not is_filler and len(q) > 5:
-                # Clean up the key string
-                final_dict[q] = a.strip()
+                valid_questions.append((q, a.strip()))
+        
+        # Define patterns for follow-up question fragments
+        # These are short questions that are typically part of a larger question
+        follow_up_patterns = [
+            "deal-breaker",  # Will match "deal-breakers" too
+            "dealbreaker",
+            "is this your own vehicle",
+            "what's your availability",
+            "what is your availability"
+        ]
+        
+        # Second pass: merge follow-up fragments with previous questions
+        # Also merge similar questions (when bot repeats after "can you repeat?")
+        
+        # Phase 1: Identify all follow-up fragment merges to perform
+        fragment_merges = {}  # Maps fragment index to main question index
+        
+        for i, (q1, a1) in enumerate(valid_questions):
+            q1_lower = q1.lower()
+            
+            # Check if this is a follow-up fragment that should be merged
+            is_follow_up = any(pattern in q1_lower for pattern in follow_up_patterns)
+            
+            if is_follow_up and len(q1) < 50:  # Only short follow-up questions
+                # Look for a related main question
+                for j, (q2, a2) in enumerate(valid_questions):
+                    if j == i:
+                        continue
+                    
+                    q2_lower = q2.lower()
+                    
+                    # Check if they are related
+                    related = False
+                    if ("deal-breaker" in q1_lower or "dealbreaker" in q1_lower) and \
+                       ("job search" in q2_lower or "most important" in q2_lower):
+                        related = True
+                    elif "vehicle" in q1_lower and "transportation" in q2_lower:
+                        related = True
+                    elif "availability" in q1_lower and ("another job" in q2_lower or "current" in q2_lower):
+                        related = True
+                    
+                    if related:
+                        fragment_merges[i] = j
+                        break
+        
+        # Phase 2: Apply fragment merges
+        used_indices = set(fragment_merges.keys())  # Fragments are consumed
+        
+        for frag_idx, main_idx in fragment_merges.items():
+            frag_q, frag_a = valid_questions[frag_idx]
+            main_q, main_a = valid_questions[main_idx]
+            
+            # Combine questions and answers - prefer the fragment's answer if main has none
+            combined_question = main_q + " " + frag_q
+            if frag_a and not main_a:
+                combined_answer = frag_a
+            elif main_a and not frag_a:
+                combined_answer = main_a
+            elif frag_a and main_a:
+                combined_answer = (main_a + " " + frag_a).strip()
+            else:
+                combined_answer = ""
+            
+            # Update the main question's entry
+            valid_questions[main_idx] = (combined_question, combined_answer)
+        
+        # Phase 3: Build final dict with similarity-based merges
+        final_dict = {}
+        
+        for i, (q1, a1) in enumerate(valid_questions):
+            if i in used_indices:
+                continue
+            
+            best_question = q1
+            best_answer = a1
+            
+            # Check for similar questions (existing logic)
+            for j, (q2, a2) in enumerate(valid_questions):
+                if i == j or j in used_indices:
+                    continue
                 
-        return final_dict
-    
+                # Calculate similarity between questions
+                similarity = SequenceMatcher(None, q1.lower(), q2.lower()).ratio()
+                
+                # If very similar (>85%), merge them
+                if similarity > 0.85:
+                    used_indices.add(j)
+                    # Prefer the question/answer pair that has an actual answer
+                    if a2 and not best_answer:
+                        best_answer = a2
+                        best_question = q2  # Use the repeated question text
+                    elif a2 and best_answer:
+                        # Both have answers, concatenate if different
+                        if a2 not in best_answer:
+                            best_answer = best_answer + " " + a2
+            
+            final_dict[best_question] = best_answer
+            used_indices.add(i)
+        
+        return final_dict 
     def calculate_similarity(self, str1, str2):
         """Calculate similarity ratio between two strings (0-1)"""
         return SequenceMatcher(None, str1.lower(), str2.lower()).ratio()
@@ -739,7 +994,18 @@ Respond with ONLY ONE WORD: Poor, Ok, Good, or Excellent"""
         os.makedirs('call_data', exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        # JSON
+        # Clean up old files FIRST - before saving the new one
+        import glob
+        old_files = glob.glob("call_data/hireology_qa_*.json")
+        
+        for old_file in old_files:
+            try:
+                os.remove(old_file)
+                print(f" Removed old file: {old_file}")
+            except Exception as e:
+                print(f" Warning: Could not remove {old_file}: {e}")
+        
+        # Now save the new JSON file
         json_file = f"call_data/hireology_qa_{timestamp}.json"
         with open(json_file, 'w', encoding='utf-8') as f:
             json.dump({
@@ -760,7 +1026,7 @@ if __name__ == "__main__":
     LOCATION_ID = "M5jnxd1r8yq3o5gxSYOP" 
     AGENT_ID = "693448f6231659c2a32a3bca"
     GROQ_API_KEY=os.getenv("GROQ_API_KEY")
-    print("The Groq API Key is :",GROQ_API_KEY)
+    
     
     extractor = HireologyQAExtractor(API_KEY, LOCATION_ID, GROQ_API_KEY)
     qa_pairs = extractor.extract_for_hireology(agent_id=AGENT_ID)
