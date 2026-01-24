@@ -1,192 +1,3 @@
-# import os
-# import re
-# import time
-# import uuid
-# import json
-# import requests
-# from dotenv import load_dotenv
-# from selenium import webdriver
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.common.keys import Keys
-# from selenium.webdriver.chrome.service import Service
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
-# from webdriver_manager.chrome import ChromeDriverManager
-# from imap_tools import MailBox, AND
-
-# # -----------------------------
-# # Load environment
-# # -----------------------------
-# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# load_dotenv(os.path.join(BASE_DIR, ".env"))
-
-# GHL_EMAIL = os.getenv("GHL_EMAIL")
-# GHL_PASSWORD = os.getenv("GHL_PASSWORD")
-# GMAIL_EMAIL = os.getenv("GMAIL_EMAIL")
-# GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD")
-
-# if not GHL_EMAIL or not GHL_PASSWORD or not GMAIL_EMAIL or not GMAIL_APP_PASSWORD:
-#     raise ValueError("❌ Missing credentials in .env")
-
-# # -----------------------------
-# # Function: Fetch OTP from Gmail (reliable version)
-# # -----------------------------
-# def get_otp_from_gmail(wait_time=15):
-#     """
-#     Fetch latest 6-digit OTP from Gmail for GHL login.
-#     """
-#     print(f"⏳ Waiting {wait_time}s for OTP email...")
-#     time.sleep(wait_time)
-    
-#     print(f"📨 Connecting to Gmail: {GMAIL_EMAIL}")
-    
-#     try:
-#         with MailBox("imap.gmail.com").login(GMAIL_EMAIL, GMAIL_APP_PASSWORD) as mailbox:
-#             print("✅ Connected to Gmail successfully!")
-            
-#             # First, search by known sender
-#             messages = list(mailbox.fetch(
-#                 AND(from_="no-reply@gohighlevel.com"),
-#                 reverse=True,
-#                 limit=10
-#             ))
-            
-#             # If not found, search for subject containing "code" or "verification"
-#             if not messages:
-#                 messages = list(mailbox.fetch(
-#                     AND(subject="code"),
-#                     reverse=True,
-#                     limit=10
-#                 ))
-            
-#             # Scan messages for 6-digit OTP
-#             for i, msg in enumerate(messages):
-#                 print(f"\nEmail {i+1}: From {msg.from_}, Subject: {msg.subject}")
-#                 body = msg.text or msg.html or ""
-#                 otp_match = re.search(r"\b\d{6}\b", body)
-#                 if otp_match:
-#                     otp = otp_match.group()
-#                     print(f"🎯 OTP FOUND: {otp}")
-#                     return otp
-            
-#             print("❌ No OTP found in recent emails!")
-#             raise Exception("OTP not found in email!")
-
-#     except Exception as e:
-#         print(f"⚠ Gmail error: {e}")
-#         raise Exception(f"Gmail connection error: {e}")
-
-# # -----------------------------
-# # Start Chrome for GHL login
-# # -----------------------------
-# options = webdriver.ChromeOptions()
-# options.add_argument("--start-maximized")
-# driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-# wait = WebDriverWait(driver, 30)
-
-# try:
-#     # 1️⃣ Open GHL login page
-#     driver.get("https://app.gohighlevel.com/")
-
-#     email_input = wait.until(EC.element_to_be_clickable((By.NAME, "email")))
-#     email_input.send_keys(GHL_EMAIL)
-
-#     password_input = wait.until(EC.element_to_be_clickable((By.NAME, "password")))
-#     password_input.send_keys(GHL_PASSWORD)
-
-#     login_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@type='submit']")))
-#     login_btn.click()
-#     print("✅ Login submitted, waiting for OTP page...")
-#     time.sleep(3)
-
-#     # 2️⃣ Click "Send Security Code"
-#     buttons = driver.find_elements(By.TAG_NAME, "button")
-#     for btn in buttons:
-#         btn_text = btn.text.strip().lower()
-#         if "send" in btn_text or "security" in btn_text or "code" in btn_text:
-#             btn.click()
-#             print(f"📨 Clicked OTP button: '{btn.text}'")
-#             break
-
-#     time.sleep(5)
-
-#     # 3️⃣ Fetch OTP from Gmail
-#     otp = get_otp_from_gmail(wait_time=10)
-#     print("🔑 OTP fetched:", otp)
-
-#     # 4️⃣ Enter OTP
-#     otp_inputs = []
-#     for _ in range(30):
-#         time.sleep(1)
-#         inputs = driver.find_elements(By.TAG_NAME, "input")
-#         otp_inputs = [
-#             i for i in inputs
-#             if i.is_displayed() and i.get_attribute("type") in ("text", "tel", "number")
-#         ]
-#         if otp_inputs:
-#             break
-
-#     if not otp_inputs:
-#         raise Exception("❌ OTP input fields not found")
-
-#     if len(otp_inputs) == 1:
-#         otp_inputs[0].send_keys(otp)
-#         otp_inputs[0].send_keys(Keys.ENTER)
-#     else:
-#         for i, digit in enumerate(otp):
-#             otp_inputs[i].send_keys(digit)
-#     print("✅ OTP submitted")
-
-#     # 5️⃣ Confirm dashboard loaded
-#     wait.until(EC.url_contains("/dashboard"))
-#     print("🎉 LOGIN SUCCESSFUL! Dashboard loaded.")
-
-#     # -----------------------------
-#     # 6️⃣ Optional: POST OTP to GHL API to get token
-#     # -----------------------------
-#     device_id = str(uuid.uuid4())
-#     payload = {
-#         "domain": "app.gohighlevel.com",
-#         "subdomain": "app",
-#         "email": GHL_EMAIL,
-#         "password": GHL_PASSWORD,
-#         "deviceId": device_id,
-#         "deviceType": "web",
-#         "deviceName": "Python Selenium Client",
-#         "otpChannel": "email",
-#         "otp": otp,
-#         "token": "",
-#         "backupCode": False,
-#         "companyId": ""
-#     }
-
-#     headers = {
-#         "accept": "application/json, text/plain, */*",
-#         "content-type": "application/json",
-#         "origin": "https://app.gohighlevel.com",
-#         "referer": "https://app.gohighlevel.com/",
-#         "user-agent": "PythonClient/3.x",
-#         "source": "WEB_USER",
-#         "channel": "APP"
-#     }
-
-#     url = "https://backend.leadconnectorhq.com/oauth/2/login/email"
-#     response = requests.post(url, headers=headers, data=json.dumps(payload))
-#     if response.status_code == 200:
-#         data = response.json()
-#         print("✅ GHL API Login successful! Token info:")
-#         print(json.dumps(data, indent=2))
-#     else:
-#         print("❌ GHL API Login failed!")
-#         print(response.status_code, response.text)
-
-# finally:
-
-    
-   
-#     # Close browser
-#     driver.quit()
-
 
 import os
 import re
@@ -317,11 +128,50 @@ def get_gohighlevel_token():
 
         time.sleep(5)
 
-        # 3️⃣ Fetch OTP from Gmail
-        otp = get_otp_from_gmail(GMAIL_EMAIL, GMAIL_APP_PASSWORD, wait_time=10)
-        print("🔑 OTP fetched:", otp)
+        # # 3️⃣ Fetch OTP from Gmail
+        # otp = get_otp_from_gmail(GMAIL_EMAIL, GMAIL_APP_PASSWORD, wait_time=10)
+        # print("🔑 OTP fetched:", otp)
 
-        # 4️⃣ Enter OTP
+        # # 4️⃣ Enter OTP
+        # otp_inputs = []
+        # for _ in range(30):
+        #     time.sleep(1)
+        #     inputs = driver.find_elements(By.TAG_NAME, "input")
+        #     otp_inputs = [
+        #         i for i in inputs
+        #         if i.is_displayed() and i.get_attribute("type") in ("text", "tel", "number")
+        #     ]
+        #     if otp_inputs:
+        #         break
+
+        # if not otp_inputs:
+        #     raise Exception("❌ OTP input fields not found")
+
+        # if len(otp_inputs) == 1:
+        #     otp_inputs[0].send_keys(otp)
+        #     otp_inputs[0].send_keys(Keys.ENTER)
+        # else:
+        #     for i, digit in enumerate(otp):
+        #         otp_inputs[i].send_keys(digit)
+        #     # After entering all digits, wait a moment and then click verify button
+        #     time.sleep(1)
+        #     try:
+        #         # Look for verify/submit button
+        #         verify_btns = driver.find_elements(By.TAG_NAME, "button")
+        #         for btn in verify_btns:
+        #             btn_text = btn.text.strip().lower()
+        #             if any(word in btn_text for word in ['verify', 'submit', 'continue', 'confirm']):
+        #                 btn.click()
+        #                 print(f"📨 Clicked verify button: '{btn.text}'")
+        #                 break
+        #     except Exception as e:
+        #         print(f"⚠️ Could not click verify button: {e}")
+        # print("✅ OTP submitted")
+        # -----------------------------
+        # 3️⃣ + 4️⃣ OTP Handling with Retry & Network Status Detection
+        # -----------------------------
+
+        # Locate OTP input fields ONCE
         otp_inputs = []
         for _ in range(30):
             time.sleep(1)
@@ -336,26 +186,74 @@ def get_gohighlevel_token():
         if not otp_inputs:
             raise Exception("❌ OTP input fields not found")
 
-        if len(otp_inputs) == 1:
-            otp_inputs[0].send_keys(otp)
-            otp_inputs[0].send_keys(Keys.ENTER)
-        else:
-            for i, digit in enumerate(otp):
-                otp_inputs[i].send_keys(digit)
-            # After entering all digits, wait a moment and then click verify button
-            time.sleep(1)
-            try:
-                # Look for verify/submit button
-                verify_btns = driver.find_elements(By.TAG_NAME, "button")
-                for btn in verify_btns:
-                    btn_text = btn.text.strip().lower()
-                    if any(word in btn_text for word in ['verify', 'submit', 'continue', 'confirm']):
-                        btn.click()
-                        print(f"📨 Clicked verify button: '{btn.text}'")
-                        break
-            except Exception as e:
-                print(f"⚠️ Could not click verify button: {e}")
-        print("✅ OTP submitted")
+        MAX_RETRIES = 10
+        attempt = 0
+        otp_verified = False
+
+        while attempt < MAX_RETRIES:
+            attempt += 1
+            print(f"🔁 OTP Attempt #{attempt}")
+
+            # Fetch new OTP
+            otp = get_otp_from_gmail(GMAIL_EMAIL, GMAIL_APP_PASSWORD, wait_time=10)
+            print("🔑 OTP fetched:", otp)
+
+            # Clear previous OTP
+            for inp in otp_inputs:
+                inp.clear()
+
+            # Enter OTP
+            if len(otp_inputs) == 1:
+                otp_inputs[0].send_keys(otp)
+                otp_inputs[0].send_keys(Keys.ENTER)
+            else:
+                for i, digit in enumerate(otp):
+                    otp_inputs[i].send_keys(digit)
+
+            time.sleep(2)
+
+            # Click verify button if present
+            for btn in driver.find_elements(By.TAG_NAME, "button"):
+                if any(w in btn.text.lower() for w in ['verify', 'submit', 'continue', 'confirm']):
+                    btn.click()
+                    break
+
+            # ⏳ Wait for backend response
+            time.sleep(5)
+
+            # 🔍 Check OTP API response
+            logs = driver.get_log('performance')
+            for entry in logs:
+                try:
+                    msg = json.loads(entry['message'])['message']
+
+                    if msg.get('method') == 'Network.responseReceived':
+                        response = msg.get('params', {}).get('response', {})
+                        url = response.get('url', '')
+                        status = response.get('status', 0)
+
+                        if '/oauth/2/login/email' in url:
+                            print(f"📡 OTP API Status: {status}")
+
+                            if status == 200 or status == 201 or status == 204:
+                                print("🎉 OTP VERIFIED SUCCESSFULLY!")
+                                otp_verified = True
+                                break
+                            else:
+                                print("❌ OTP INVALID / EXPIRED")
+
+                except Exception:
+                    continue
+
+            if otp_verified:
+                break
+
+            print("⏳ Waiting 2 minutes before retry...")
+            time.sleep(120)
+
+        if not otp_verified:
+            raise Exception("❌ OTP verification failed after multiple retries")
+
 
         # 5️⃣ Confirm dashboard/app loaded - check for various URL patterns
         print("⏳ Waiting for dashboard to load...")
@@ -613,13 +511,10 @@ if __name__ == "__main__":
     auth_token = get_gohighlevel_token()
     if auth_token:
         print(f"\n[SUCCESS] Token retrieved successfully!")
-        print(f"Token: {auth_token}")
+        print(f"{auth_token}")
         # Save token to file for verification
         with open("token_output.txt", "w", encoding="utf-8") as f:
-            f.write(f"Token retrieved successfully!\n")
-            f.write(f"Token: {auth_token}\n")
+            f.write(f"{auth_token}\n")
         print("Token saved to token_output.txt")
     else:
         print("\n[FAILED] Failed to retrieve token")
-        with open("token_output.txt", "w", encoding="utf-8") as f:
-            f.write("Failed to retrieve token\n")

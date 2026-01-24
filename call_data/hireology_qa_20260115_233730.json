@@ -7,10 +7,10 @@
   "qa_pairs": [
     {
       "question": "Can you tell me a little about your background and experience in care professionals?",
-      "answer": "Yes. I have four years of experience. I've worked in home care facilities. Assisted living facilities. I'm a CNA. I'm familiar with pretty much everything within the health industry.",
+      "answer": "Can you repeat the question?",
       "rating": "Excellent",
-      "matched_question": "Of course! Can you tell me a little about your background and experience as a care professional?",
-      "match_score": 1.5414285714285711
+      "matched_question": "Can you tell me a little about your background and experience as a care professional?",
+      "match_score": 1.5590025359256126
     },
     {
       "question": "What motivated you to become a care professional?",
@@ -56,10 +56,10 @@
     },
     {
       "question": "Do you have reliable transportation to get to clients' homes? Is this your own vehicle?",
-      "answer": "Yes. and yes.",
-      "rating": "Excellent",
-      "matched_question": "Thank you! Do you have reliable transportation to get to clients’ homes? Is this your own vehicle?",
-      "match_score": 1.1122522522522522
+      "answer": "",
+      "rating": "Ok",
+      "matched_question": "Thank you! Do you have reliable transportation to get to clients’ homes?",
+      "match_score": 0.6680817610062894
     },
     {
       "question": "Why do you want to work for our home care agency specifically?",
@@ -84,10 +84,10 @@
     },
     {
       "question": "Experience with Hospice Clients",
-      "answer": "",
-      "rating": "Ok",
-      "matched_question": "Great! Let’s get started.",
-      "match_score": 0.11428571428571428
+      "answer": "On Indeed.",
+      "rating": "Excellent",
+      "matched_question": "Great, thank you! How did you hear about us?",
+      "match_score": 0.1386666666666667
     },
     {
       "question": "Experience with a client on Hospice Care who is Transitioning",
@@ -123,20 +123,6 @@
       "rating": "Excellent",
       "matched_question": "Thank you! Do you have experience emptying foley catheters and male condom catheters?",
       "match_score": 1.2530612244897956
-    },
-    {
-      "question": "How did you hear about us?",
-      "answer": "On Indeed.",
-      "rating": "Excellent",
-      "matched_question": "Great, thank you! How did you hear about us?",
-      "match_score": 0.4228571428571429
-    },
-    {
-      "question": "As you go through your job search, what things do you consider to be most important? What are some deal-breakers?",
-      "answer": "I wanna work with a company that knows how to communicate and values my expertise.",
-      "rating": "Excellent",
-      "matched_question": "Thank you! As you go through your job search, what things do you consider most important? What are some deal-breakers?",
-      "match_score": 0.4779220779220779
     }
   ]
 }

@@ -1,0 +1,128 @@
+{
+  "call_info": {
+    "date": "2026-01-12T14:04:05.008Z",
+    "duration": 34,
+    "call_id": "6964ff55e8ee2b38dac40504"
+  },
+  "qa_pairs": [
+    {
+      "question": "Can you tell me a little about your background and experience in care professionals?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "What motivated you to become a care professional?",
+      "answer": "",
+      "rating": "Ok",
+      "matched_question": "The call is recorded. Ready to begin?",
+      "match_score": 0.11162790697674418
+    },
+    {
+      "question": "Do you have any certifications or specialized training related to caregiving? (CNA, MA, CPR, etc.)",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Can you name a few caregiving tasks you have experience in?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Do you have experience with tasks such as bathing, dressing, and toileting clients?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Do you have another job? What's your availability?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "How flexible is your schedule, and are you available for overnight or weekend shifts if needed?",
+      "answer": "",
+      "rating": "Ok",
+      "matched_question": "Just checking in—are you still there?",
+      "match_score": 0.10454545454545455
+    },
+    {
+      "question": "Do you have reliable transportation to get to clients' homes? Is this your own vehicle?",
+      "answer": "Sorry. I cannot hear you. The word is exactly.",
+      "rating": "Good",
+      "matched_question": "Let me know if you'd like to continue!",
+      "match_score": 0.09119999999999999
+    },
+    {
+      "question": "Why do you want to work for our home care agency specifically?",
+      "answer": "Place an order.",
+      "rating": "Ok",
+      "matched_question": "Hi , this is Dawson and Dawson Home Care, LLC's AI assistant. You can say, 'Don't call me again,' to opt out. Hi! This is the Hiring assistant from Dawson and Dawson care LLC. I’m calling to complete your caregiver interview.",
+      "match_score": 0.1127177700348432
+    },
+    {
+      "question": "Experience using a Hoyer Lift or Stand Assist? (Manual or Electric)",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience using a Gait Belt?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience with Hospice Clients",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience with a client on Hospice Care who is Transitioning",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience using a Sliding board?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience with Total Care Clients and/or bedridden clients?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience giving bed baths, changing the client in bed, turning, repositioning, and changing sheets of a bedridden client?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    },
+    {
+      "question": "Experience emptying foley catheters and male condom catheters?",
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
+    }
+  ]
+}
