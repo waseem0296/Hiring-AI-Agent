@@ -1,0 +1,84 @@
+{
+  "timestamp": "2026-01-31T00:33:21.763295",
+  "steps_completed": [
+    "step1_screening"
+  ],
+  "errors": [],
+  "candidates_called": [
+    {
+      "candidate_id": 47879684,
+      "phone": "+16135189745",
+      "call_id": null,
+      "duration": null,
+      "status": "completed"
+    }
+  ],
+  "screened_applicants": [
+    {
+      "candidate_id": 47879684,
+      "candidate_job_id": 58974200,
+      "email": "basil+111@dawsonhomecare.com",
+      "status": "Candidate",
+      "record": {
+        "candidate_id": 47879684,
+        "first_name": "Basil",
+        "last_name": "test79",
+        "email": "basil+111@dawsonhomecare.com",
+        "phone_number": "+16135189745",
+        "address": "536 Joe Frazier rd",
+        "city": "Beaufort",
+        "state": "SC",
+        "zip_code": "29906",
+        "job_name": "Job Simulation Please Dont Use this (TEST)",
+        "status": "Applicant",
+        "applied_at": "2026-01-30T19:33:31.333Z",
+        "What was/ is your most recent pay rate?": "30",
+        "Which hands-on caregiving tasks have you independently performed?": "dd",
+        "What is your availability to start? Immediately or within a required timeframe?": "imee",
+        "Have you worked in an assisted living or long-term care facility before?": "ff",
+        "Can you briefly describe your previous caregiving roles, including your main responsibilities and the care settings you worked in?": "EE",
+        "Do you currently hold any caregiving-related certifications (CNA, PCT, LPN, RN, MedTech, etc.)?": "EE",
+        "How many years of professional caregiving experience do you have?": "2",
+        "Do you have a valid driver's license, and car insurance?": "yes",
+        "Are you able to pass a drug screen?": "yes",
+        "Have you been arrested, convicted of a felony, or misdemeanor?": "no",
+        "Please provide the contact name and phone number of 2-3 former supervisors. *Cannot be co-workers, family, or friends*": "Mr.Smith +16135189745 Mr.Smith +16135189745"
+      },
+      "phone": "+16135189745"
+    }
+  ],
+  "candidates_to_call": [
+    {
+      "candidate_id": 47879684,
+      "candidate_job_id": 58974200,
+      "email": "basil+111@dawsonhomecare.com",
+      "status": "Candidate",
+      "record": {
+        "candidate_id": 47879684,
+        "first_name": "Basil",
+        "last_name": "test79",
+        "email": "basil+111@dawsonhomecare.com",
+        "phone_number": "+16135189745",
+        "address": "536 Joe Frazier rd",
+        "city": "Beaufort",
+        "state": "SC",
+        "zip_code": "29906",
+        "job_name": "Job Simulation Please Dont Use this (TEST)",
+        "status": "Applicant",
+        "applied_at": "2026-01-30T19:33:31.333Z",
+        "What was/ is your most recent pay rate?": "30",
+        "Which hands-on caregiving tasks have you independently performed?": "dd",
+        "What is your availability to start? Immediately or within a required timeframe?": "imee",
+        "Have you worked in an assisted living or long-term care facility before?": "ff",
+        "Can you briefly describe your previous caregiving roles, including your main responsibilities and the care settings you worked in?": "EE",
+        "Do you currently hold any caregiving-related certifications (CNA, PCT, LPN, RN, MedTech, etc.)?": "EE",
+        "How many years of professional caregiving experience do you have?": "2",
+        "Do you have a valid driver's license, and car insurance?": "yes",
+        "Are you able to pass a drug screen?": "yes",
+        "Have you been arrested, convicted of a felony, or misdemeanor?": "no",
+        "Please provide the contact name and phone number of 2-3 former supervisors. *Cannot be co-workers, family, or friends*": "Mr.Smith +16135189745 Mr.Smith +16135189745"
+      },
+      "phone": "+16135189745"
+    }
+  ]
+}

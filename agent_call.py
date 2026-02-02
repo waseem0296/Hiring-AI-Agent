@@ -64,6 +64,7 @@ def make_trial_call(
         if response.status_code == 200 or response.status_code == 201:
             result = response.json()
             print(f"✅ Call initiated successfully!")
+            print("the responce of call results are :",result)
             print(f"   Response: {json.dumps(result, indent=2)}")
             return result
         else:

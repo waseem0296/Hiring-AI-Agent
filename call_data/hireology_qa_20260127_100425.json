@@ -1,0 +1,128 @@
+{
+  "call_info": {
+    "date": "2026-01-21T20:04:09.333Z",
+    "duration": 227,
+    "call_id": "69713139f6d16772f3306216"
+  },
+  "qa_pairs": [
+    {
+      "question": "Can you tell me a little about your background and experience in care professionals?",
+      "answer": "Yes. I've been a CNA for eight years. I've worked in hospital settings, worked all types of clients have experience with Alzheimer's and dementia.",
+      "rating": "Excellent",
+      "matched_question": "Can you tell me a little about your background and experience as a care professional?",
+      "match_score": 1.5590025359256126
+    },
+    {
+      "question": "What motivated you to become a care professional?",
+      "answer": "I watch my mother and grandmother do the type of work and decided that I wanted to when I came out of high school.",
+      "rating": "Excellent",
+      "matched_question": "Next, what motivated you to become a care professional?",
+      "match_score": 1.2826923076923076
+    },
+    {
+      "question": "Do you have any certifications or specialized training related to caregiving? (CNA, MA, CPR, etc.)",
+      "answer": "Yes. MedTech and CNA.",
+      "rating": "Excellent",
+      "matched_question": "That's wonderful—thank you for sharing. Do you have any caregiving certifications, such as CNA, Medication Tech, PCA, LPN, or Nurse?",
+      "match_score": 0.5667149758454106
+    },
+    {
+      "question": "Can you name a few caregiving tasks you have experience in?",
+      "answer": "Bathing, grooming, showering, dressing, all of the basic ADLs. Also have worked in facilities and in the home care setting.",
+      "rating": "Excellent",
+      "matched_question": "Got it—CNA and MedTech. Can you name a few caregiving tasks you have experience in?",
+      "match_score": 1.2492957746478872
+    },
+    {
+      "question": "Do you have experience with tasks such as bathing, dressing, and toileting clients?",
+      "answer": "Yes.",
+      "rating": "Excellent",
+      "matched_question": "Thank you for that! Do you have experience with tasks such as bathing, dressing, and toileting clients?",
+      "match_score": 1.4177419354838707
+    },
+    {
+      "question": "Do you have another job? What's your availability?",
+      "answer": "I'm pretty flexible, but I prefer working night I do have another job where I work during the day, Monday and Wednesday.",
+      "rating": "Excellent",
+      "matched_question": "What’s your availability?",
+      "match_score": 0.6086666666666667
+    },
+    {
+      "question": "How flexible is your schedule, and are you available for overnight or weekend shifts if needed?",
+      "answer": "Yes.",
+      "rating": "Excellent",
+      "matched_question": "Thank you for sharing that. How flexible is your schedule, and are you available for overnight or weekend shifts if needed?",
+      "match_score": 1.5614678899082566
+    },
+    {
+      "question": "Do you have reliable transportation to get to clients' homes? Is this your own vehicle?",
+      "answer": "",
+      "rating": "Ok",
+      "matched_question": "Great! Do you have reliable transportation to get to clients’ homes?",
+      "match_score": 0.6739247311827957
+    },
+    {
+      "question": "Why do you want to work for our home care agency specifically?",
+      "answer": "Ma'am, I just heard it was a good company to work for and that, um, that's care about your clients as much as you care about your caregivers.",
+      "rating": "Excellent",
+      "matched_question": "Got it—effective communication is important to you. Why do you want to work for our home care agency specifically?",
+      "match_score": 1.2113636363636362
+    },
+    {
+      "question": "Experience using a Hoyer Lift or Stand Assist? (Manual or Electric)",
+      "answer": "Yes.",
+      "rating": "Excellent",
+      "matched_question": "Alright. Do you have experience using a Hoyer Lift or Stand Assist, whether manual or electric?",
+      "match_score": 1.087037037037037
+    },
+    {
+      "question": "Experience using a Gait Belt?",
+      "answer": "Yes.",
+      "rating": "Excellent",
+      "matched_question": "Great! How about experience using a Gait Belt?",
+      "match_score": 1.0819999999999999
+    },
+    {
+      "question": "Experience with Hospice Clients",
+      "answer": "Indeed.",
+      "rating": "Excellent",
+      "matched_question": "Perfect. How did you hear about us?",
+      "match_score": 0.1696969696969697
+    },
+    {
+      "question": "Experience with a client on Hospice Care who is Transitioning",
+      "answer": "Yes.",
+      "rating": "Excellent",
+      "matched_question": "Got it. Do you have experience with a client on hospice care who is transitioning?",
+      "match_score": 1.2559440559440558
+    },
+    {
+      "question": "Experience using a Sliding board?",
+      "answer": "No.",
+      "rating": "Ok",
+      "matched_question": "Thank you. Do you have experience using a Sliding Board?",
+      "match_score": 1.0724719101123594
+    },
+    {
+      "question": "Experience with Total Care Clients and/or bedridden clients?",
+      "answer": "Yes.",
+      "rating": "Excellent",
+      "matched_question": "Thank you. Do you have experience with total care clients and/or bedridden clients?",
+      "match_score": 1.2517482517482514
+    },
+    {
+      "question": "Experience giving bed baths, changing the client in bed, turning, repositioning, and changing sheets of a bedridden client?",
+      "answer": "Yes.",
+      "rating": "Excellent",
+      "matched_question": "Alright. Do you have experience giving bed baths, changing the client in bed, turning, repositioning, and changing sheets of a bedridden client?",
+      "match_score": 1.4264044943820222
+    },
+    {
+      "question": "Experience emptying foley catheters and male condom catheters?",
+      "answer": "No.",
+      "rating": "Ok",
+      "matched_question": "Thank you. Do you have experience emptying foley catheters and male condom catheters?",
+      "match_score": 1.2530612244897956
+    }
+  ]
+}

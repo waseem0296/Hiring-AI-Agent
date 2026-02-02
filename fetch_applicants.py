@@ -15,7 +15,7 @@ def get_candidates(jwt_token, job_id, page_size=10):
         "Content-Type": "application/json",
         "Accept": "application/json"
     }
-    params = {
+    params = { 
         "filter[status]": "Applicant",
         "sort_dir": "desc",
         "sort_step_id": "",
@@ -46,7 +46,7 @@ def get_candidate_documents(jwt_token, job_id, candidate_id, transfer=False):
     }
 
     params = {
-        "transfer": str(transfer).lower()  # API expects true/false as string
+        "transfer":str(transfer).lower()  # API expects true/false as string
     }
 
     try:
@@ -56,7 +56,7 @@ def get_candidate_documents(jwt_token, job_id, candidate_id, transfer=False):
 
     except requests.exceptions.HTTPError as http_err:
         print(f"HTTP Error: {http_err}")
-        print("Response:", response.text)
+        print("Response:", response.text) 
     except Exception as err:
         print(f"Error: {err}")
 
@@ -70,46 +70,6 @@ def extract_applicant_ids(response_json):
     return [applicant["id"] for applicant in response_json.get("data", [])]
 
 
-# def build_single_applicant_record(application_json):
-#     """
-#     Extract all application data for a single applicant including 
-#     basic info and all custom question answers.
-#     """
-#     item = application_json[0]  # one applicant
-    
-#     candidate = item.get("candidate", {})
-    
-#     # Basic candidate information
-#     record = {
-#         "candidate_id": candidate.get("id", "N/A"),
-#         "first_name": candidate.get("first_name", "N/A"),
-#         "last_name": candidate.get("last_name", "N/A"),
-#         "email": candidate.get("email", "N/A"),
-#         "phone_number": candidate.get("phone_number", "N/A"),
-#         "address": candidate.get("street_address", "N/A"),
-#         "city": candidate.get("city", "N/A"),
-#         "state": candidate.get("state", "N/A"),
-#         "zip_code": candidate.get("zip_code", "N/A"),
-#         "job_name": item.get("job_name", "N/A"),
-#         "status": candidate.get("status", "N/A"),
-#         "applied_at": candidate.get("applied_at", "N/A"),
-#     }
-    
-#     # ✅ CORRECT PATH: application -> application_form_data -> custom_answers
-#     custom_answers = (
-#         item.get("application", {})
-#             .get("application_form_data", {})
-#             .get("custom_answers", {})
-#     )
-    
-#     # Add all custom question answers to the record
-#     for question, answer_obj in custom_answers.items():
-#         answer = answer_obj.get("answer")
-#         # Clean up the question text for column header
-#         clean_question = question.strip()
-#         record[clean_question] = answer if answer not in (None, "") else "N/A"
-    
-#     return record
 
 def build_single_applicant_record(application_json):
     """
@@ -145,37 +105,6 @@ def build_single_applicant_record(application_json):
     for question, answer_obj in custom_answers.items():
         answer = answer_obj.get("answer")
         record[question.strip()] = answer if answer not in (None, "") else "N/A"
-
-    # # ---------------- WORK HISTORY (IMPORTANT PART) ----------------
-    # work_history = (
-    #     item.get("application", {})
-    #         .get("candidate_work_history", [])
-    # )
-    # print("Work History:.................",work_history)
-
-    # if work_history:
-    #     titles = []
-    #     companies = [] 
-    #     locations = []
-
-    #     for job in work_history:
-    #         if job.get("job_title_held"):
-    #             titles.append(job.get("job_title_held"))
-
-    #         if job.get("company_name"):
-    #             companies.append(job.get("company_name"))
-
-    #         if job.get("city"):
-    #             locations.append(job.get("city"))
-
-    #     record["previous_job_titles"] = ", ".join(titles) if titles else "N/A"
-    #     record["previous_companies"] = ", ".join(companies) if companies else "N/A"
-    #     record["previous_job_locations"] = ", ".join(locations) if locations else "N/A"
-    # else:
-    #     record["previous_job_titles"] = "N/A"
-    #     record["previous_companies"] = "N/A"
-    #     record["previous_job_locations"] = "N/A"
-
     return record
 
 
@@ -229,6 +158,7 @@ def get_incomplete_questions(applicant_record):
     }
 
     incomplete = []
+    
 
     SUPERVISOR_QUESTION = (
         "Please provide the contact name and phone number of 2-3 former supervisors. "
@@ -270,7 +200,6 @@ def send_incomplete_application_email(
     headers = {
         "Authorization": f"Bearer {jwt_token}",
         "Accept": "*/*"
-        # DO NOT set Content-Type manually
     }
 
     questions_html = "".join(
@@ -294,13 +223,16 @@ def send_incomplete_application_email(
     """
 
     data = {
-        "candidate_job_ids[]": str(candidate_job_id),
-        "user[email_to]": candidate_email,
-        "user[email_subject]": "Incomplete Application – Action Required",
-        "user[email_body]": email_body,
-        "job_id": str(job_id),
-        "email_type": "custom"
+    "candidate_job_ids[]": str(candidate_job_id),
+    "user[email_to]": candidate_email,
+    "user[email_from]": "basil@dawsonhomecare.com",
+    "user[email_subject]": "Incomplete Application – Action Required",
+    "user[email_body]": email_body.strip(),
+    "jobId": str(job_id),
+    "filter_by_job": "false",
+    "email_type": "custom"
     }
+
 
     try:
         response = requests.post(
@@ -314,7 +246,7 @@ def send_incomplete_application_email(
         print(f"Response: {response.text}")
 
         # Check if email was sent successfully
-        if response.status_code == 200:
+        if response.ok:
             return True
         else:
             return False
@@ -426,7 +358,14 @@ def get_rejection_reason(applicant_record):
     return "; ".join(reasons)
 
 
-def send_rejection_email(jwt_token, candidate_job_id, candidate_email, job_name, rejection_reason):
+def send_rejection_email(
+    jwt_token,
+    candidate_job_id,
+    candidate_email,
+    job_id,
+    job_name,
+    rejection_reason
+):
     """
     Send rejection email to candidate.
     Returns True if successful, False otherwise.
@@ -451,14 +390,16 @@ def send_rejection_email(jwt_token, candidate_job_id, candidate_email, job_name,
     <p>We encourage you to apply for future opportunities that match your skills.</p>
 
     <p>Thank you,<br>Hiring Team</p>
-    """
+    """.strip()
 
     data = {
         "candidate_job_ids[]": str(candidate_job_id),
         "user[email_to]": candidate_email,
-        "user[email_subject]": "Application Status – Rejection",
+        "user[email_from]": "basil@dawsonhomecare.com",
+        "user[email_subject]": "Application Status – Update",
         "user[email_body]": email_body,
-        "job_id": str(candidate_job_id),
+        "jobId": str(job_id),
+        "filter_by_job": "false",
         "email_type": "custom"
     }
 
@@ -468,10 +409,10 @@ def send_rejection_email(jwt_token, candidate_job_id, candidate_email, job_name,
         print(f"📧 Rejection Email POST status: {response.status_code}")
         print(f"📧 Response: {response.text}")
 
-        return response.status_code == 200
+        return response.ok
 
     except Exception as e:
-        print(f"❌ Rejection email sending failed with exception: {e}")
+        print(f"Rejection email sending failed with exception: {e}")
         return False
 
 

@@ -30,7 +30,7 @@ from formate_most_recent_callTranscript_to_Structured_json import HireologyQAExt
 
 from update_phoneInterview_on_Hireology import (
     fetch_interview_from_api,
-    update_interview_answers,
+    update_interview_answers, 
     send_update_to_hireology,
     trigger_score_calculation,
     display_update_logs
@@ -56,7 +56,7 @@ class CallStatusChecker:
             "Version": "2021-07-28"
         }
 
-    def get_call_status(self, call_id: str):
+    def  get_call_status(self, call_id: str):
         """
         Check real-time call status using callId
         """
@@ -285,7 +285,7 @@ class HiringWorkflowOrchestrator:
                 )
                 
                 if not documents:
-                    print(f"❌ Failed to fetch documents for {candidate_id}")
+                    print(f"Failed to fetch documents for {candidate_id}")
                     continue
                 
                 # Build applicant record
@@ -332,7 +332,7 @@ class HiringWorkflowOrchestrator:
                 # Handle rejection
                 if final_status == "Inactive":
                     rejection_reason = get_rejection_reason(applicant_record)
-                    print(f"📧 Sending rejection email...")
+                    print(f"Sending rejection email...")
                     
                     email_sent = send_rejection_email(
                         jwt_token=jwt,
@@ -376,6 +376,7 @@ class HiringWorkflowOrchestrator:
             print(f"\n{'─'*80}")
             print("🔍 Also fetching EXISTING candidates (already in Candidate status)...")
             print(f"{'─'*80}")
+            
             
             try:
                 # Fetch candidates with "Candidate" status
@@ -516,10 +517,12 @@ class HiringWorkflowOrchestrator:
                     'phone': phone,
                     'call_id': completed_call.get('id'),
                     'duration': completed_call.get('duration'),
-                    'status': 'completed'
+                    # 'status': 'completed'  
+                    'status': completed_call.get('callStatus')
                 })
+                print("func call from step1b after wait_for_call_completion for check status: ", completed_call.get('callStatus'))
                 return completed_call
-            else:
+            else: 
                 self.results['candidates_called'].append({
                     'candidate_id': candidate.get('candidate_id'),
                     'phone': phone,
@@ -532,6 +535,105 @@ class HiringWorkflowOrchestrator:
             print(f"\n❌ {error_msg}")
             self.results['errors'].append(error_msg)
             return None
+    
+    def check_interview_postponement(self, json_path: str) -> bool:
+        """
+        Check if the interview should be skipped based on:
+        1. Duration less than 100 seconds
+        2. Candidate used interview postponing words in top 7 questions
+        
+        Args:
+            json_path: Path to the JSON file with interview data
+            
+        Returns:
+            True if step3 should be skipped, False otherwise
+        """
+        # Postponing phrases to look for
+        POSTPONING_PHRASES = [
+            "busy now",
+            "busy right now",
+            "can we talk later",
+            "talk later",
+            "can you postpone",
+            "can you postponed",
+            "postpone the interview",
+            "reschedule",
+            "call me back",
+            "call back later",
+            "not a good time",
+            "bad time",
+            "can't talk now",
+            "cannot talk now",
+            "can't talk right now",
+            "in a meeting",
+            "at work",
+            "driving",
+            "i'm driving",
+            "call me later",
+            "later please",
+            "some other time",
+            "another time",
+            "not right now",
+            "give me a minute",
+            "hold on",
+            "wait a moment",
+            "i'm occupied",
+            "occupied right now",
+            "schedule for another day",
+            "different time",
+            "not available",
+            "unavailable",
+            "can we do this later",
+            "can we reschedule",
+            "talk tomorrow",
+            "call tomorrow"
+        ]
+        
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # Get duration from call_info
+            call_info = data.get('call_info', {})
+            duration = call_info.get('duration', 0)
+            
+            # Get qa_pairs
+            qa_pairs = data.get('qa_pairs', [])
+            
+            # Check only the top 7 questions
+            top_7_qa = qa_pairs[:7] if len(qa_pairs) >= 7 else qa_pairs
+            
+            # Check for postponing phrases in answers
+            postponing_found = False
+            for qa in top_7_qa:
+                answer = qa.get('answer', '').lower()
+                for phrase in POSTPONING_PHRASES:
+                    if phrase.lower() in answer:
+                        postponing_found = True
+                        print(f"   ⚠️ Postponing phrase found: '{phrase}' in answer: '{qa.get('answer', '')[:50]}...'")
+                        break
+                if postponing_found:
+                    break
+            
+            # Decision logic: Skip step3 if duration < 100 AND postponing words found
+            # OR if only postponing words are used (which usually means short call)
+            if duration < 100 and postponing_found:
+                print(f"\n   🚫 Interview postponement detected:")
+                print(f"      - Duration: {duration} seconds (< 100 seconds)")
+                print(f"      - Postponing words found in top 7 questions")
+                print(f"      - Skipping Hireology update for this candidate")
+                return True
+            elif postponing_found:
+                print(f"\n   ⚠️ Postponing words found in answers but duration is {duration} seconds")
+                # If duration is >= 100 but postponing words found, still check more carefully
+                # We skip only if duration is also short (< 100 seconds)
+                return True
+            
+            return False
+            
+        except Exception as e:
+            print(f"   ⚠️ Error checking interview postponement: {str(e)}")
+            return False
     
     def step2_process_phone_interview(self, agent_id=None):
         """Step 2: Process most recent phone interview transcript"""
@@ -759,18 +861,35 @@ class HiringWorkflowOrchestrator:
             print(f"{'='*80}")
             
             # Step 1B: Make call and wait for completion
+            # this is temporarily commented
+            # ///////////////////////////////////////////
             completed_call = self.step1b_make_call_and_wait(candidate)
             
             if not completed_call:
                 print(f"\n⚠️ Call did not complete for candidate {candidate.get('candidate_id')}")
                 print("   Skipping to next candidate...")
                 continue
-            
+            if not completed_call.get('status') == 'completed':
+                print(f"\n Call did not pic by candidate {candidate.get('candidate_id')}")
+                print("   Skipping to next candidate...")
+                continue
             # Step 2: Process phone interview transcript
             json_path = self.step2_process_phone_interview()
             
             if not json_path:
                 print(f"\n⚠️ Failed to process interview for candidate {candidate.get('candidate_id')}")
+                continue
+            
+            # Check for interview postponement before proceeding to Step 3
+            should_skip_step3 = self.check_interview_postponement(json_path)
+            
+            if should_skip_step3:
+                print(f"\n⏭️ Skipping Step 3 for candidate {candidate.get('candidate_id')} due to interview postponement")
+                self.results['candidates_called'].append({
+                    'candidate_id': candidate.get('candidate_id'),
+                    'status': 'postponed',
+                    'reason': 'Interview postponed - duration < 100s and postponing words detected'
+                })
                 continue
             
             # Step 3: Update Hireology
@@ -903,9 +1022,15 @@ class HiringWorkflowOrchestrator:
             # Step 1B: Make call and wait for completion
             completed_call = self.step1b_make_call_and_wait(candidate)
             # completed_call = True
+            print("The completed call #####################", completed_call)
 
             if not completed_call:
                 print(f"\n Call did not complete for candidate {current_candidate_id}")
+                print("   Skipping to next candidate...")
+                continue
+            print("Call status:",completed_call.get('callStatus'))
+            if completed_call.get('callStatus') != 'completed':
+                print(f"\nCandidate {current_candidate_id} did not pick up the call")
                 print("   Skipping to next candidate...")
                 continue
             
@@ -914,6 +1039,18 @@ class HiringWorkflowOrchestrator:
             
             if not json_path:
                 print(f"\n Failed to process interview for candidate {current_candidate_id}")
+                continue
+             
+            # Check for interview postponement before proceeding to Step 3
+            should_skip_step3 = self.check_interview_postponement(json_path)
+            
+            if should_skip_step3:
+                print(f"\n⏭️ Skipping Step 3 for candidate {current_candidate_id} due to interview postponement")
+                self.results['candidates_called'].append({
+                    'candidate_id': current_candidate_id,
+                    'status': 'postponed',
+                    'reason': 'Interview postponed - duration < 100s and postponing words detected'
+                })
                 continue
             
             # Step 3: Update Hireology
@@ -941,7 +1078,7 @@ class HiringWorkflowOrchestrator:
         # Display score if available
         if 'interview_score' in self.results:
             print(f"\n Latest Interview Results:")
-            print(f"   Interview ID: {self.results.get('interview_id', 'N/A')}")
+            # print(f"   Interview ID: {self.results.get('interview_id', 'N/A')}")
             print(f"   Final Score: {self.results.get('interview_score', 'N/A')}")
             print(f"   Confidence Score: {self.results.get('confidence_score', 'N/A')}")
             print(f"   Questions Matched: {self.results.get('matched_questions', 0)}")
@@ -985,7 +1122,7 @@ from applicant_id_fetcher import get_applicants_info
 if __name__ == "__main__":
     print("New execution started")
     jwt = get_valid_jwt()
-    print("The extracted tken is :",jwt)
+    print("The extracted token is :",jwt)
     job_id = "2606114"
     
     ghl_token_id = get_valid_ghl_token()
@@ -1014,7 +1151,7 @@ if __name__ == "__main__":
         print(f" Using Candidate ID: {candidate_id}")
         print(f" Candidate Phone: {candidate_phone}")
         
-    
+     
     
     # GHL Token ID (for making calls - this needs to be a valid session token)
     
