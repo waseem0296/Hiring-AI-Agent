@@ -1,8 +1,8 @@
 {
   "call_info": {
-    "date": "2026-01-12T14:04:05.008Z",
-    "duration": 34,
-    "call_id": "6964ff55e8ee2b38dac40504"
+    "date": "2026-01-30T19:57:42.932Z",
+    "duration": 30,
+    "call_id": "697d0d3694c21b197830ac5d"
   },
   "qa_pairs": [
     {
@@ -14,10 +14,10 @@
     },
     {
       "question": "What motivated you to become a care professional?",
-      "answer": "",
+      "answer": "N/A",
       "rating": "Ok",
-      "matched_question": "The call is recorded. Ready to begin?",
-      "match_score": 0.11162790697674418
+      "matched_question": null,
+      "match_score": 0
     },
     {
       "question": "Do you have any certifications or specialized training related to caregiving? (CNA, MA, CPR, etc.)",
@@ -49,24 +49,24 @@
     },
     {
       "question": "How flexible is your schedule, and are you available for overnight or weekend shifts if needed?",
-      "answer": "",
+      "answer": "N/A",
       "rating": "Ok",
-      "matched_question": "Just checking in—are you still there?",
-      "match_score": 0.10454545454545455
+      "matched_question": null,
+      "match_score": 0
     },
     {
       "question": "Do you have reliable transportation to get to clients' homes? Is this your own vehicle?",
-      "answer": "Sorry. I cannot hear you. The word is exactly.",
-      "rating": "Good",
-      "matched_question": "Let me know if you'd like to continue!",
-      "match_score": 0.09119999999999999
+      "answer": "N/A",
+      "rating": "Ok",
+      "matched_question": null,
+      "match_score": 0
     },
     {
       "question": "Why do you want to work for our home care agency specifically?",
-      "answer": "Place an order.",
+      "answer": "No. I'm busy right now. you call me later sometime?",
       "rating": "Ok",
-      "matched_question": "Hi , this is Dawson and Dawson Home Care, LLC's AI assistant. You can say, 'Don't call me again,' to opt out. Hi! This is the Hiring assistant from Dawson and Dawson care LLC. I’m calling to complete your caregiver interview.",
-      "match_score": 0.1127177700348432
+      "matched_question": "Hi , this is Dawson and Dawson Home Care, LLC's AI assistant. You can say, 'Don't call me again,' to opt out. I’m calling to complete your caregiver interview. The call is recorded. Ready to begin?",
+      "match_score": 0.12181467181467182
     },
     {
       "question": "Experience using a Hoyer Lift or Stand Assist? (Manual or Electric)",

@@ -15,7 +15,7 @@ def start_auto_monitor(
     get_hireology_token_func,
     get_ghl_token_func,
     job_id="2606114",
-    check_interval=60
+    check_interval=20
 ):
     """
     Start automatic monitoring for new applicants

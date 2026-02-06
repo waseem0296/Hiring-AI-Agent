@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-02-05T01:44:55.036537",
+  "steps_completed": [
+    "step1_screening",
+    "step2_interview_processing",
+    "step3_interview_update"
+  ],
+  "errors": [],
+  "candidates_called": [],
+  "screened_applicants": [
+    {
+      "candidate_id": 47961733,
+      "email": "basil+80@dawsonhomecare.com",
+      "status": "incomplete_email_sent"
+    }
+  ],
+  "candidates_to_call": [],
+  "interview_json_path": "call_data\\hireology_qa_20260205_014528.json",
+  "qa_pairs_count": 17,
+  "interview_id": "50428823",
+  "candidate_id": 47961733,
+  "interview_score": 87,
+  "confidence_score": 27,
+  "interview_updated": true,
+  "matched_questions": 11
+}
