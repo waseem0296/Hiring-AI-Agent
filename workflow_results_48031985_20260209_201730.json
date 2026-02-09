@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-02-09T20:16:53.977844",
+  "steps_completed": [
+    "step1_screening",
+    "step2_interview_processing",
+    "step3_interview_update"
+  ],
+  "errors": [],
+  "candidates_called": [],
+  "screened_applicants": [
+    {
+      "candidate_id": 48031985,
+      "email": "tahirzain419@gmail.com",
+      "status": "incomplete_email_sent"
+    },
+    {
+      "candidate_id": 48031847,
+      "email": "tahirzain249@gmail.com",
+      "status": "incomplete_email_sent"
+    },
+    {
+      "candidate_id": 48031778,
+      "email": "basil+120@dawsonhomecare.com",
+      "status": "incomplete_email_sent"
+    }
+  ],
+  "candidates_to_call": [],
+  "interview_json_path": "call_data\\hireology_qa_20260209_201722.json",
+  "qa_pairs_count": 17,
+  "interview_id": "50493485",
+  "candidate_id": 48031985,
+  "interview_score": 87,
+  "confidence_score": 27,
+  "interview_updated": true,
+  "matched_questions": 11
+}

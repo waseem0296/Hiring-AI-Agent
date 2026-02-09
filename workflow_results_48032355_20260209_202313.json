@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-02-09T20:22:59.822249",
+  "steps_completed": [
+    "step2_interview_processing",
+    "step3_interview_update"
+  ],
+  "errors": [
+    "Step 1 failed: send_rejection_email() missing 1 required positional argument: 'job_id'"
+  ],
+  "candidates_called": [],
+  "interview_json_path": "call_data\\hireology_qa_20260209_202304.json",
+  "qa_pairs_count": 17,
+  "interview_id": "50493874",
+  "candidate_id": 48032355,
+  "interview_score": 87,
+  "confidence_score": 27,
+  "interview_updated": true,
+  "matched_questions": 11
+}

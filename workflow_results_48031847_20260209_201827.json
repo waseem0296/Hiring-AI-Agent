@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-02-09T20:18:00.863213",
+  "steps_completed": [
+    "step1_screening",
+    "step2_interview_processing",
+    "step3_interview_update"
+  ],
+  "errors": [],
+  "candidates_called": [],
+  "screened_applicants": [],
+  "candidates_to_call": [],
+  "interview_json_path": "call_data\\hireology_qa_20260209_201820.json",
+  "qa_pairs_count": 17,
+  "interview_id": "50493341",
+  "candidate_id": 48031847,
+  "interview_score": 87,
+  "confidence_score": 27,
+  "interview_updated": true,
+  "matched_questions": 11
+}

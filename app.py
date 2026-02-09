@@ -138,56 +138,7 @@ class CallStatusChecker:
         if not phone:
             return ""
         return ''.join(filter(str.isdigit, str(phone)))
-    
-    # def wait_for_call_completion(
-    #     self, 
-    #     phone_number: str, 
-    #     timeout_minutes: int = 7, 
-    #     poll_interval_seconds: int = 10,
-    #     call_start_time: datetime = None
-    # ) -> dict:
-    #     """
-    #     Wait for a call to be completed
-        
-    #     Args:
-    #         phone_number: Phone number to monitor
-    #         timeout_minutes: Maximum time to wait
-    #         poll_interval_seconds: How often to check for call completion
-    #         call_start_time: When the call was initiated (to filter old calls)
-        
-    #     Returns:
-    #         Call data when completed, or None if timeout
-    #     """
-    #     start_time = datetime.now()
-    #     timeout = timedelta(minutes=timeout_minutes)
-        
-    #     print(f"\n⏳ Waiting for call to complete...")
-    #     print(f"   Phone: {phone_number}")
-    #     print(f"   Timeout: {timeout_minutes} minutes")
-    #     print(f"   Polling every {poll_interval_seconds} seconds")
-        
-    #     while datetime.now() - start_time < timeout:
-    #         # Check for completed call
-    #         completed_call = self.get_recent_call_for_phone(
-    #             phone_number, 
-    #             since_time=call_start_time
-    #         )
-            
-    #         if completed_call:
-    #             status = completed_call.get('status', 'unknown')
-    #             print(f"\n✅ Call finished! Status: {status}")
-    #             print(f"   Call ID: {completed_call.get('id', 'N/A')}")
-    #             print(f"   Duration: {completed_call.get('duration', 'N/A')} seconds")
-    #             return completed_call
-            
-    #         # Wait before next poll
-    #         elapsed = datetime.now() - start_time
-    #         remaining = timeout - elapsed
-    #         print(f"   ⏳ Waiting... (elapsed: {int(elapsed.total_seconds())}s, remaining: {int(remaining.total_seconds())}s)")
-    #         time.sleep(poll_interval_seconds)
-        
-    #     print(f"\n⚠️ Timeout: Call did not complete within {timeout_minutes} minutes")
-    #     return None
+        return None
 
 def wait_for_call_completion(call_checker, call_id, timeout=300, interval=5):
     """
@@ -1201,5 +1152,7 @@ if __name__ == "__main__":
     # 1. Check for new applicants every 60 seconds
     # 2. Automatically call them
     # 3. Process the interview
+
+    
     print("Starting Auto-Monitor...")
     run_auto_monitor()

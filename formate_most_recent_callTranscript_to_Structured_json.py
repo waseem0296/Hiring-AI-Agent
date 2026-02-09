@@ -737,6 +737,17 @@ Respond with ONLY ONE WORD: Poor, Ok, Good, or Excellent"""
     def save_hireology_format(self, qa_pairs, call_info):
         """Save in multiple formats for Hireology"""
         os.makedirs('call_data', exist_ok=True)
+        
+        # Delete all previous hireology_qa_*.json files before saving new one
+        import glob
+        existing_files = glob.glob('call_data/hireology_qa_*.json')
+        for old_file in existing_files:
+            try:
+                os.remove(old_file)
+                print(f"Deleted previous file: {old_file}")
+            except OSError as e:
+                print(f"Error deleting {old_file}: {e}")
+        
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
         # JSON
